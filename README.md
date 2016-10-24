@@ -11,7 +11,8 @@ Students are provided 2 datasets: The Wikinews data (roughly 3.3M) contains 11,2
 For each of bullet we check our understanding and check to each other
 We had some question related to relationship between terms that figured out is the one blog (one row in the data)
 - The problem is that how should we work with wordle and tagcrowd? What is the input and output?
-If we just put the one column it shows the 50 top for that column but if we have two column it is not 50 top for each of them. - How can we figure out the relationship of different columns?
+If we just put the one column it shows the 50 top for that column but if we have two column it is not 50 top for each of them.
+- How can we figure out the relationship of different columns?
    * Answer:
 
 
