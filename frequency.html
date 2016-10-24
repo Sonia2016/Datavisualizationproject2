@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+</head>
+<body>
+  <h3>Text Input</h3>
+  <textarea id="text" placeholder="type something..." rows="20" cols="80"></textarea>
+  <button id="analyse">Click to analyze</button>
+  <h3>Results</h3>
+  <div id="results"></div>
+</body>
+</html>
+
+<script>
+	/*jshint asi:true laxcomma:true expr:true boss:true eqnull:true*/
+
+var doc = document
+
+var extend = function(a, b) {
+  Object.keys(b).forEach(function(k){a[k] = b[k]})
+  return a
+}
+
+var elem = function(tag, props) {
+  return extend(doc.createElement(tag), props)
+}
+
+/**
+ * @param words {Array}
+ * @returns {Object} Frequency of words per length
+ */
+var frequency = function(words) {
+  return words.filter(Boolean).reduce(function(acc, x) {
+    acc[x] = ++acc[x] || 1
+    return acc
+  },{})
+}
+
+var empty = function(x) {
+  while (x.hasChildNodes())
+    x.removeChild(x.lastChild)
+  return x
+}
+
+/**
+ * @param freq {Object} Frequence of words per length
+ * @returns {Node} Document fragment
+ */
+var max = 0;
+var resultOf = function(freq) {
+  return Object.keys(freq).reduce(function(frag, k) {
+    frag.appendChild(elem('p', {
+        textContent: 'Words with '+ k +' chars: '+ freq[k]
+    }))
+    return frag
+  }, doc.createDocumentFragment())
+}
+
+var textarea = doc.getElementById('text')
+var button = doc.getElementById('analyse')
+var result = doc.getElementById('results')
+
+var wordfreq = {};
+var higwords;
+function highFrequency(words){
+  var max = 0 ; 
+   for(var i = 0 ; i < 50 ; i++){
+    for(var w in words){
+          if(words[w] > max){
+            max = words[w];
+            higwords = w;
+            wordfreq[higwords] = max;
+          }
+        }
+        delete words[higwords];
+        max = 0;
+   }
+  console.log(wordfreq);
+}
+
+
+button.addEventListener('click', function() {
+
+  var freqMap = {};
+  var words = frequency(textarea.value.split('|'));
+  highFrequency(words);
+
+  var res = resultOf(frequency(textarea.value.split('|')))
+  empty(result).appendChild(res)
+})
+</script>
