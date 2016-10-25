@@ -28,8 +28,8 @@ var elem = function(tag, props) {
  * @param words {Array}
  * @returns {Object} Frequency of words per length
  */
-var frequency = function(words) {
-  return words.filter(Boolean).reduce(function(acc, x) {
+var frequency = function(words_array) {
+  return words_array.filter(Boolean).reduce(function(acc, x) {
     acc[x] = ++acc[x] || 1
     return acc
   },{})
@@ -44,16 +44,21 @@ var empty = function(x) {
  * @returns {Node} Document fragment
  */
 var organization="";
-d3.tsv("wikinews.tsv", function(error, words) {
-	console.log(words.length);
+var words1;
+d3.tsv("wikinews.tsv", function(error, words_array) {
+	//console.log(words.length);
 	
 	//console.log("--	"+organization);
-	words.forEach(function(d) {
-			organization=organization+d.organization+"|";				
+	words_array.forEach(function(d) {
+			organization=organization+d.organization+",";	
+			//doc.getElementById('text').innerHTML=doc.getElementById('text').value+""+d.organization+"|";			
 	});
 	doc.getElementById('text').innerHTML=""+organization;
+	words1=doc.getElementById('text').innerHTML;
+	//console.log(doc.getElementById('text').value);
 });
-
+//var words1=doc.getElementById('text').innerHTML;
+console.log("words1 "+words1);
  var max = 0;
 var resultOf = function(freq) {
   return Object.keys(freq).reduce(function(frag, k) {
@@ -66,31 +71,149 @@ var resultOf = function(freq) {
 var textarea = doc.getElementById('text')
 var button = doc.getElementById('analyse')
 var result = doc.getElementById('results')
-var wordfreq = {};
+var wordfreq = [];
 var higwords;
-var words=[];
+var words_array=[];
+var data=[""];
 
-
-function highFrequency(words){
+function highFrequency(words_array){
   var max = 0 ; 
    for(var i = 0 ; i < 50 ; i++){
-    for(var w in words){
-          if(words[w] > max){
-            max = words[w];
+    for(var w in words_array){
+          if(words_array[w] > max){
+            max = words_array[w];
             higwords = w;
             wordfreq[higwords] = max;
+			//data[i]=higwords+",";
           }
         }
-        delete words[higwords];
+        delete words_array[higwords];
         max = 0;
+		
    }
+  //console.log(data[0]);
   console.log(wordfreq);
+  
+	for(var w in wordfreq){
+			//console.log(wordfreq[w]+"--");
+			data[0]=data[0]+" "+w+"_"+wordfreq[w]+"|";
+		}
+		data[0]+=data[0]+""+",";
+		console.log(data[0]);
+}
+console.log(data.length);
+for(i=0; i<data.length;i++)
+{
+	console.log(data[i]);
 }
 button.addEventListener('click', function() {
   var freqMap = {};
-  var words = frequency(textarea.value.split('|'));
-  highFrequency(words);
+  var words_array = frequency(textarea.value.split('|'));
+  highFrequency(words_array);
   var res = resultOf(frequency(textarea.value.split('|')))
-  empty(result).appendChild(res)
+  //empty(result).appendChild(res)
+  showNewWords(myWordCloud);
 })
+// Encapsulate the word cloud functionality
+function wordCloud(selector) {
+
+    var fill = d3.scale.category20();
+
+    //Construct the word cloud's SVG element
+    var svg = d3.select(selector).append("svg")
+        .attr("width", 500)
+        .attr("height", 500)
+        .append("g")
+        .attr("transform", "translate(250,250)");
+
+
+    //Draw the word cloud
+    function draw(words) {
+        var cloud = svg.selectAll("g text")
+                        .data(words, function(d) { return d.text; })
+
+        //Entering words
+        cloud.enter()
+            .append("text")
+            .style("font-family", "Impact")
+            .style("fill", function(d, i) { return fill(i); })
+            .attr("text-anchor", "middle")
+            .attr('font-size', 1)
+            .text(function(d) { return d.text; });
+
+        //Entering and existing words
+        cloud
+            .transition()
+                .duration(600)
+                .style("font-size", function(d) { return d.size + "px"; })
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .style("fill-opacity", 1);
+
+        //Exiting words
+        cloud.exit()
+            .transition()
+                .duration(200)
+                .style('fill-opacity', 1e-6)
+                .attr('font-size', 1)
+                .remove();
+    }
+
+
+    //Use the module pattern to encapsulate the visualisation code. We'll
+    // expose only the parts that need to be public.
+    return {
+
+        //Recompute the word cloud for a new set of words. This method will
+        // asycnhronously call draw when the layout has been computed.
+        //The outside world will need to call this function, so make it part
+        // of the wordCloud return value.
+        update: function(words) {
+            d3.layout.cloud().size([500, 500])
+                .words(words)
+                .padding(5)
+                .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                .font("Impact")
+                .fontSize(function(d) { return d.size; })
+                .on("end", draw)
+                .start();
+        }
+    }
+
+}
+/*var words = [
+    "You don't know about me without you have read a book called The Adventures of Tom Sawyer but that ain't no matter.",
+    "The boy with fair hair lowered himself down the last few feet of rock and began to pick his way toward the lagoon.",
+    "When Mr. Bilbo Baggins of Bag End announced that he would shortly be celebrating his eleventy-first birthday with a party of special magnificence, there was much talk and excitement in Hobbiton.",
+    "It was inevitable: the scent of bitter almonds always reminded him of the fate of unrequited love."
+]*/
+var words=words1;
+//Prepare one of the sample sentences by removing punctuation,
+// creating an array of words and computing a random size attribute.
+function getWords(i) {
+	//debugger;
+	return data[i]
+            //.replace('|', '')
+			.replace(/[!\.,:;\?]/g, '')
+            //.split(' ')
+            .split('|')
+            .map(function(d) {
+                return {text: d, size: 10 + Math.random() * 60};
+            })
+}
+//This method tells the word cloud to redraw with a new set of words.
+//In reality the new words would probably come from a server request,
+// user input or some other source.
+function showNewWords(vis, i) {
+    i = i || 0;
+	vis.update(getWords(i ++ % data.length))
+    //vis.update(data[i])
+    
+	setTimeout(function() { showNewWords(vis, i + 1)}, 2000)
+	
+}
+//Create a new instance of the word cloud visualisation.
+var myWordCloud = wordCloud('body');
+showNewWords(myWordCloud);
 </script>
