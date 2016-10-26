@@ -21,7 +21,7 @@ If we just put the one column it shows the 50 top for that column but if we have
 We decided to do 50 top frequency of each category data until Wednesday.
 As this time, we figured out heap is the best one to restore the data because of time complexity but it can be change if we find better one.
 ##### Action List
-- [ ] Sonia is working on "Person" and "Miscellanous"
+- [X] Sonia is working on "Person" and "Miscellanous"
 - [ ] Brindivani is working on "Location"
 - [ ] Arun is working on "Organization"
 
