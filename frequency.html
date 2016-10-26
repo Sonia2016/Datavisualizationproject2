@@ -33,8 +33,10 @@ var elem = function(tag, props) {
  */
 var frequency = function(words) {
   return words.filter(Boolean).reduce(function(acc, x) {
-    acc[x] = ++acc[x] || 1
-    return acc
+    for(var i = 0 ; i < x.length; i++){
+      if(x[i] != "")
+       acc[x[i]] = ++acc[x[i]] || 1;}
+      return acc;
   },{})
 }
 
@@ -84,8 +86,14 @@ function highFrequency(words){
 button.addEventListener('click', function() {
 
   var freqMap = {};
-  var words = frequency(textarea.value.split('|'));
-  highFrequency(words);
+  var wrdsLine = textarea.value.split('\n');
+  var words = [];
+  for(var w in wrdsLine){
+    words.push(wrdsLine[w].split('|'));
+  }
+  var wordfrequency = frequency(words);
+  console.log(wordfrequency);
+  highFrequency(wordfrequency);
 
   var res = resultOf(frequency(textarea.value.split('|')))
   empty(result).appendChild(res)
