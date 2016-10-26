@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+</head>
+
+</html>
+ <script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+	/*jshint asi:true laxcomma:true expr:true boss:true eqnull:true*/
+
+var doc = document
+
+var extend = function(a, b) {
+  Object.keys(b).forEach(function(k){a[k] = b[k]})
+  return a
+}
+
+var elem = function(tag, props) {
+  return extend(doc.createElement(tag), props)
+}
+
+/**
+ * @param words {Array}
+ * @returns {Object} Frequency of words per length
+ */
+var frequency = function(words) {
+  return words.filter(Boolean).reduce(function(acc, x) {
+    for(var i = 0 ; i < x.length; i++){
+      if(x[i] != "")
+       acc[x[i]] = ++acc[x[i]] || 1;}
+      return acc;
+  },{})
+}
+
+var empty = function(x) {
+  while (x.hasChildNodes())
+    x.removeChild(x.lastChild)
+  return x
+}
+
+/**
+ * @param freq {Object} Frequence of words per length
+ * @returns {Node} Document fragment
+ */
+var max = 0;
+var resultOf = function(freq) {
+  return Object.keys(freq).reduce(function(frag, k) {
+    frag.appendChild(elem('p', {
+        textContent: 'Words with '+ k +' chars: '+ freq[k]
+    }))
+    return frag
+  }, doc.createDocumentFragment())
+}
+
+var textarea = doc.getElementById('text')
+var button = doc.getElementById('analyse')
+var result = doc.getElementById('results')
+
+
+function highFrequency(words){
+  var wordfreq = {};
+  var higwords;
+  var max = 0 ; 
+   for(var i = 0 ; i < 50 ; i++){
+    for(var w in words){
+          if(words[w] > max){
+            max = words[w];
+            higwords = w;
+            wordfreq[higwords] = max;
+          }
+        }
+        delete words[higwords];
+        max = 0;
+   }
+  return wordfreq;
+}
+
+var blogs;
+var topOrganization = [];
+var topPerson = [];
+var topLocation = [];
+var topMiscellaneous = [];
+d3.tsv("wikinews.tsv", function(error, data) {
+
+  data.forEach(function(d) {
+      d.time = d3.time.format("%Y-%m-%d").parse(d.time.slice(0,10));
+    });
+ 
+  blogs =  d3.keys(data[0]).slice(1).map(function(id) {
+    return {
+      id: id,
+      values: data.map(function(d) {
+        return {time: d.time, person: d.person, location:d.location, organization:d.organization, miscellaneous:d.miscellaneous};
+      })
+    };
+  });
+
+  // console.log(blogs);
+
+  for(var b in blogs){
+    for(var i = 0 ; i < blogs[b].values.length; i++){
+      topOrganization.push(blogs[b].values[i].organization.split('|'));
+      topLocation.push(blogs[b].values[i].location.split('|'));
+      topMiscellaneous.push(blogs[b].values[i].miscellaneous.split('|'));
+      topPerson.push(blogs[b].values[i].person.split('|'));
+    }
+  }
+
+  topOrganization = frequency(topOrganization);
+  topPerson = frequency(topPerson);
+  topLocation = frequency(topLocation);
+  topMiscellaneous = frequency(topMiscellaneous);
+
+  top50Location = highFrequency(topLocation);
+  top50Person = highFrequency(topPerson);
+  top50Miscellaneous = highFrequency(topMiscellaneous);
+  top50Organization =  highFrequency(topOrganization);
+  
+  console.log(top50Location);
+  console.log(top50Person);
+  console.log(top50Miscellaneous);
+  console.log(top50Organization);
+
+});
+
+
+
+</script>
