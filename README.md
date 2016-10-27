@@ -35,9 +35,9 @@ We have a plan to finish our data processing until the end of this week (24th-28
 #### Find some samples related to bubble-chart
 We decided to work on sample codes that we found.
 ##### Action List
-- [X] Sonia is working on relationship, cleaning data, and also some relationship implementation
-- [X] Brindivani is working on relationship code and find some sample code for this
-- [X] Arun is working on bubble chart with our data
+- [ ] Sonia is working on relationship, cleaning data, and also some relationship implementation
+- [ ] Brindivani is working on relationship code and find some sample code for this
+- [ ] Arun is working on bubble chart with our data
 
 the next meeting is Monday at 11am
 
