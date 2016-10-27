@@ -21,11 +21,23 @@ If we just put the one column it shows the 50 top for that column but if we have
 We decided to do 50 top frequency of each category data until Wednesday.
 As this time, we figured out heap is the best one to restore the data because of time complexity but it can be change if we find better one.
 ##### Action List
-- [ ] Sonia is working on "Person" and "Miscellanous"
-- [ ] Brindivani is working on "Location"
-- [ ] Arun is working on "Organization"
+- [X] Sonia is working on "Person" and "Miscellanous"
+- [X] Brindivani is working on "Location"
+- [X] Arun is working on "Organization"
 
 We have a plan to finish our data processing until the end of this week (24th-28th) October
 
 
 - Note: Arun mentioned that for relationship we can use index for all data in the same line (such as line number that we have variable to increment and assign to whole data in that line)
+
+
+### Third meeting - October 27
+#### Find some samples related to bubble-chart
+We decided to work on sample codes that we found.
+##### Action List
+- [X] Sonia is working on relationship, cleaning data, and also some relationship implementation
+- [X] Brindivani is working on relationship code and find some sample code for this
+- [X] Arun is working on bubble chart with our data
+
+the next meeting is Monday at 11am
+
