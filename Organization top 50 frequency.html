@@ -5,15 +5,15 @@
   <title>JS Bin</title>
 </head>
 <body>
-  <h3>Text Input</h3>
-  <textarea id="text" placeholder="type something..." rows="20" cols="80"></textarea>
-  <button id="analyse">Click to analyze</button>
-  <h3>Results</h3>
-  <div id="results"></div>
+<button type="button" onclick=showNewWords(myWordCloud,1)>Person</button>
+<button type="button" onclick=showNewWords(myWordCloud,3)>Location</button>
+<button type="button" onclick=showNewWords(myWordCloud,0)>Organization</button>
+<button type="button" onclick=showNewWords(myWordCloud,2)>Miscellaneous</button>
 </body>
+
 </html>
  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+ <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
 <script>
 	/*jshint asi:true laxcomma:true expr:true boss:true eqnull:true*/
 var doc = document
@@ -28,10 +28,12 @@ var elem = function(tag, props) {
  * @param words {Array}
  * @returns {Object} Frequency of words per length
  */
-var frequency = function(words_array) {
-  return words_array.filter(Boolean).reduce(function(acc, x) {
-    acc[x] = ++acc[x] || 1
-    return acc
+var frequency = function(words) {
+  return words.filter(Boolean).reduce(function(acc, x) {
+    for(var i = 0 ; i < x.length; i++){
+      if(x[i] != "")
+       acc[x[i]] = ++acc[x[i]] || 1;}
+      return acc;
   },{})
 }
 var empty = function(x) {
@@ -43,23 +45,13 @@ var empty = function(x) {
  * @param freq {Object} Frequence of words per length
  * @returns {Node} Document fragment
  */
-var organization="";
-var words1;
-d3.tsv("wikinews.tsv", function(error, words_array) {
-	//console.log(words.length);
-	
-	//console.log("--	"+organization);
-	words_array.forEach(function(d) {
-			organization=organization+d.organization+",";	
-			//doc.getElementById('text').innerHTML=doc.getElementById('text').value+""+d.organization+"|";			
-	});
-	doc.getElementById('text').innerHTML=""+organization;
-	words1=doc.getElementById('text').innerHTML;
-	//console.log(doc.getElementById('text').value);
-});
-//var words1=doc.getElementById('text').innerHTML;
-console.log("words1 "+words1);
- var max = 0;
+var max = 0;
+var array_value=0;
+function assign_array_value(i)
+{
+	array_value=i;
+	showNewWords(myWordCloud, i);
+}
 var resultOf = function(freq) {
   return Object.keys(freq).reduce(function(frag, k) {
     frag.appendChild(elem('p', {
@@ -71,58 +63,100 @@ var resultOf = function(freq) {
 var textarea = doc.getElementById('text')
 var button = doc.getElementById('analyse')
 var result = doc.getElementById('results')
-var wordfreq = [];
-var higwords;
-var words_array=[];
-var data=[""];
-
-function highFrequency(words_array){
+function highFrequency(words){
+  var wordfreq = {};
+  var higwords;
   var max = 0 ; 
    for(var i = 0 ; i < 50 ; i++){
-    for(var w in words_array){
-          if(words_array[w] > max){
-            max = words_array[w];
+    for(var w in words){
+          if(words[w] > max){
+            max = words[w];
             higwords = w;
             wordfreq[higwords] = max;
-			//data[i]=higwords+",";
           }
         }
-        delete words_array[higwords];
+        delete words[higwords];
         max = 0;
-		
    }
-  //console.log(data[0]);
-  console.log(wordfreq);
+  return wordfreq;
+}
+var blogs;
+var topOrganization = [];
+var topPerson = [];
+var topLocation = [];
+var topMiscellaneous = [];
+var top50Org =[""];
+var top50Per =[""];
+var top50Loc =[""];
+var top50Mis =[""];
+d3.tsv("wikinews.tsv", function(error, data) {
+  data.forEach(function(d) {
+      d.time = d3.time.format("%Y-%m-%d").parse(d.time.slice(0,10));
+    });
+ 
+  blogs =  d3.keys(data[0]).slice(1).map(function(id) {
+    return {
+      id: id,
+      values: data.map(function(d) {
+        return {time: d.time, person: d.person, location:d.location, organization:d.organization, miscellaneous:d.miscellaneous};
+      })
+    };
+  });
+  // console.log(blogs);
+  for(var b in blogs){
+    for(var i = 0 ; i < blogs[b].values.length; i++){
+      topOrganization.push(blogs[b].values[i].organization.split('|'));
+      topLocation.push(blogs[b].values[i].location.split('|'));
+      topMiscellaneous.push(blogs[b].values[i].miscellaneous.split('|'));
+      topPerson.push(blogs[b].values[i].person.split('|'));
+    }
+  }
+  topOrganization = frequency(topOrganization);
+  topPerson = frequency(topPerson);
+  topLocation = frequency(topLocation);
+  topMiscellaneous = frequency(topMiscellaneous);
+  top50Location = highFrequency(topLocation);
+  top50Person = highFrequency(topPerson);
+  top50Miscellaneous = highFrequency(topMiscellaneous);
+  top50Organization =  highFrequency(topOrganization);
   
-	for(var w in wordfreq){
-			//console.log(wordfreq[w]+"--");
-			data[0]=data[0]+" "+w+"_"+wordfreq[w]+"|";
-		}
-		data[0]+=data[0]+""+",";
-		console.log(data[0]);
-}
-console.log(data.length);
-for(i=0; i<data.length;i++)
-{
-	console.log(data[i]);
-}
-button.addEventListener('click', function() {
-  var freqMap = {};
-  var words_array = frequency(textarea.value.split('|'));
-  highFrequency(words_array);
-  var res = resultOf(frequency(textarea.value.split('|')))
-  //empty(result).appendChild(res)
-  showNewWords(myWordCloud);
-})
+  console.log(top50Location);
+  console.log(top50Person);
+  console.log(top50Miscellaneous);
+  console.log(top50Organization);
+	
+	// For loop to put hashmap data into the array
+	for (var key in top50Location)
+	{
+		top50Loc[0]=top50Loc[0]+""+key+" "+top50Location[key]+"|";
+	}
+	for (var key in top50Person)
+	{
+		top50Per[0]=top50Per[0]+""+key+" "+top50Person[key]+"|";
+	}
+	for (var key in top50Miscellaneous)
+	{
+		top50Mis[0]=top50Mis[0]+""+key+" "+top50Miscellaneous[key]+"|";
+	}
+	for (var key in top50Organization)
+	{
+		top50Org[0]=top50Org[0]+""+key+" "+top50Organization[key]+"|";
+	}
+	//console.log("Org "+top50Org[0]);
+	//console.log("Per "+top50Per[0]);
+	//console.log("Loc "+top50Loc[0]);
+	//console.log("Mis "+top50Mis[0]);
+	showNewWords(myWordCloud);
+});
+var words =[""];
 // Encapsulate the word cloud functionality
 function wordCloud(selector) {
 
     var fill = d3.scale.category20();
-
-    //Construct the word cloud's SVG element
+	//Construct the word cloud's SVG element
     var svg = d3.select(selector).append("svg")
-        .attr("width", 500)
-        .attr("height", 500)
+        .attr("width", 800)
+        .attr("height", 600)
         .append("g")
         .attr("transform", "translate(250,250)");
 
@@ -148,6 +182,7 @@ function wordCloud(selector) {
                 .style("font-size", function(d) { return d.size + "px"; })
                 .attr("transform", function(d) {
                     return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                    //return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
                 })
                 .style("fill-opacity", 1);
 
@@ -182,38 +217,39 @@ function wordCloud(selector) {
     }
 
 }
-/*var words = [
-    "You don't know about me without you have read a book called The Adventures of Tom Sawyer but that ain't no matter.",
-    "The boy with fair hair lowered himself down the last few feet of rock and began to pick his way toward the lagoon.",
-    "When Mr. Bilbo Baggins of Bag End announced that he would shortly be celebrating his eleventy-first birthday with a party of special magnificence, there was much talk and excitement in Hobbiton.",
-    "It was inevitable: the scent of bitter almonds always reminded him of the fate of unrequited love."
-]*/
-var words=words1;
+
 //Prepare one of the sample sentences by removing punctuation,
 // creating an array of words and computing a random size attribute.
 function getWords(i) {
 	//debugger;
-	return data[i]
-            //.replace('|', '')
-			.replace(/[!\.,:;\?]/g, '')
-            //.split(' ')
+    return words[i]
+            .replace(/[!\.,:;\?"]/g, '')
             .split('|')
             .map(function(d) {
-                return {text: d, size: 10 + Math.random() * 60};
+				return {text: d, size: 10 + Math.random() * 60};
             })
 }
+
 //This method tells the word cloud to redraw with a new set of words.
 //In reality the new words would probably come from a server request,
 // user input or some other source.
 function showNewWords(vis, i) {
     i = i || 0;
-	vis.update(getWords(i ++ % data.length))
-    //vis.update(data[i])
-    
-	setTimeout(function() { showNewWords(vis, i + 1)}, 2000)
-	
+    //i = array_value;
+	words[0]=top50Org[0]
+	words[1]=top50Per[0]
+	words[2]=top50Mis[0]
+	words[3]=top50Loc[0];
+	console.log(i);
+    vis.update(getWords(i))
+    //vis.update(getWords(i ++ % words.length))
+   //setTimeout(function() { showNewWords(vis, i + 1)}, 2000)
 }
+
 //Create a new instance of the word cloud visualisation.
 var myWordCloud = wordCloud('body');
-showNewWords(myWordCloud);
+
+//Start cycling through the demo data
+
+
 </script>
