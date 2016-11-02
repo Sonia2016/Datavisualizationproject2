@@ -2,13 +2,17 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>JS Bin</title>
+  <title></title>
 </head>
 <body>
-<button type="button" onclick=showNewWords(myWordCloud,1)>Person</button>
-<button type="button" onclick=showNewWords(myWordCloud,3)>Location</button>
-<button type="button" onclick=showNewWords(myWordCloud,0)>Organization</button>
-<button type="button" onclick=showNewWords(myWordCloud,2)>Miscellaneous</button>
+<div>
+	
+	<button type="button" onclick=showNewWords(myWordCloud,1)>Person</button>
+	<button type="button" onclick=showNewWords(myWordCloud,3)>Location</button>
+	<button type="button" onclick=showNewWords(myWordCloud,0)>Organization</button>
+	<button type="button" onclick=showNewWords(myWordCloud,2)>Miscellaneous</button>
+	<div id="chart">	
+</div>
 </body>
 
 </html>
@@ -105,12 +109,15 @@ d3.tsv("wikinews.tsv", function(error, data) {
   // console.log(blogs);
   for(var b in blogs){
     for(var i = 0 ; i < blogs[b].values.length; i++){
-      topOrganization.push(blogs[b].values[i].organization.split('|'));
-      topLocation.push(blogs[b].values[i].location.split('|'));
-      topMiscellaneous.push(blogs[b].values[i].miscellaneous.split('|'));
-      topPerson.push(blogs[b].values[i].person.split('|'));
-    }
+		var dat = new Date(blogs[b].values[i].time);
+		var dd=dat.getDate()+""+dat.getMonth()+""+dat.getFullYear();
+		topOrganization.push(blogs[b].values[i].organization.split('|'));
+		topLocation.push(blogs[b].values[i].location.split('|'));
+		topMiscellaneous.push(blogs[b].values[i].miscellaneous.split('|'));
+		topPerson.push(blogs[b].values[i].person.split('|'));
+	}
   }
+  //debugger;
   topOrganization = frequency(topOrganization);
   topPerson = frequency(topPerson);
   topLocation = frequency(topLocation);
@@ -128,52 +135,73 @@ d3.tsv("wikinews.tsv", function(error, data) {
 	// For loop to put hashmap data into the array
 	for (var key in top50Location)
 	{
-		top50Loc[0]=top50Loc[0]+""+key+" "+top50Location[key]+"|";
+		top50Loc[0]=top50Loc[0]+""+key+"*"+top50Location[key]+"|";
+		
 	}
 	for (var key in top50Person)
 	{
-		top50Per[0]=top50Per[0]+""+key+" "+top50Person[key]+"|";
+		top50Per[0]=top50Per[0]+""+key+"*"+top50Person[key]+"|";
 	}
 	for (var key in top50Miscellaneous)
 	{
-		top50Mis[0]=top50Mis[0]+""+key+" "+top50Miscellaneous[key]+"|";
+		top50Mis[0]=top50Mis[0]+""+key+"*"+top50Miscellaneous[key]+"|";
 	}
 	for (var key in top50Organization)
 	{
-		top50Org[0]=top50Org[0]+""+key+" "+top50Organization[key]+"|";
+		top50Org[0]=top50Org[0]+""+key+"*"+top50Organization[key]+"|";
 	}
-	//console.log("Org "+top50Org[0]);
+	
+	//save_content_to_file("asdasdasd", "D:\TTU\Visuals\Project_2\testaa");
+	console.log("Org "+top50Org[0]);
 	//console.log("Per "+top50Per[0]);
 	//console.log("Loc "+top50Loc[0]);
 	//console.log("Mis "+top50Mis[0]);
 	showNewWords(myWordCloud);
 });
+
+
 var words =[""];
+var color="blue";
+var width = 650,
+	height = 550;
 // Encapsulate the word cloud functionality
-function wordCloud(selector) {
+function wordCloud(selector,color) {
 
     var fill = d3.scale.category20();
 	//Construct the word cloud's SVG element
-    var svg = d3.select(selector).append("svg")
-        .attr("width", 800)
-        .attr("height", 600)
-        .append("g")
-        .attr("transform", "translate(250,250)");
+    var svg = d3.select(chart)
+			.append("svg")
+			.attr("border",2)
+			.attr("width", width )
+			.attr("height", height)
+			.append("g");
+			
+		var borderPath = svg.append("rect")
+       			.attr("width", width)
+				.attr("height", height)
+       			.style("stroke", 'gray')
+       			.style("fill", "none")
+       			.style("stroke-width", 2);
 
-
+					//svg.append("rect")
     //Draw the word cloud
     function draw(words) {
         var cloud = svg.selectAll("g text")
                         .data(words, function(d) { return d.text; })
-
-        //Entering words
-        cloud.enter()
-            .append("text")
-            .style("font-family", "Impact")
-            .style("fill", function(d, i) { return fill(i); })
-            .attr("text-anchor", "middle")
-            .attr('font-size', 1)
-            .text(function(d) { return d.text; });
+						cloud.enter()
+						.append("text")
+						.style("font-family", "Impact")
+						.style("stroke", 'gray')
+						.style("fill", "none")
+						.style("stroke-width", 1)
+						//.style("fill", function(d, i) { return fill(i); })// color
+						.style("fill",color)// color
+						.attr("text-anchor", "middle")
+						.text(function(d) { return d.text; })
+						.attr("transform", function(d) {
+							return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
+							//return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
+							});
 
         //Entering and existing words
         cloud
@@ -181,7 +209,7 @@ function wordCloud(selector) {
                 .duration(600)
                 .style("font-size", function(d) { return d.size + "px"; })
                 .attr("transform", function(d) {
-                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                    return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
                     //return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
                 })
                 .style("fill-opacity", 1);
@@ -205,10 +233,12 @@ function wordCloud(selector) {
         //The outside world will need to call this function, so make it part
         // of the wordCloud return value.
         update: function(words) {
-            d3.layout.cloud().size([500, 500])
+		//debugger;
+            d3.layout.cloud().size([500, 600])
                 .words(words)
-                .padding(5)
-                .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                .padding(2)
+                //.rotate(function() { return ~~(Math.random() * 2) * 90; })
+                .rotate(0)
                 .font("Impact")
                 .fontSize(function(d) { return d.size; })
                 .on("end", draw)
@@ -221,12 +251,14 @@ function wordCloud(selector) {
 //Prepare one of the sample sentences by removing punctuation,
 // creating an array of words and computing a random size attribute.
 function getWords(i) {
-	//debugger;
-    return words[i]
-            .replace(/[!\.,:;\?"]/g, '')
+	return words[i]
+            .replace(/[!\.,:;\?"']/g, '')
             .split('|')
             .map(function(d) {
-				return {text: d, size: 10 + Math.random() * 60};
+				//var s=d.substring(d.indexOf("*")+1);
+				//console.log(d+"  "+d.substring(0,d.indexOf("*")));
+				//return {text: d, size: 10 + Math.random() * 60};
+				return {text: d.substring(0,d.indexOf("*")), size: (((d.substring(d.indexOf("*")+1))/100)+15)};
             })
 }
 
@@ -247,7 +279,7 @@ function showNewWords(vis, i) {
 }
 
 //Create a new instance of the word cloud visualisation.
-var myWordCloud = wordCloud('body');
+var myWordCloud = wordCloud('body',color);
 
 //Start cycling through the demo data
 
