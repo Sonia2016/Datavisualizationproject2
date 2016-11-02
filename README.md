@@ -51,10 +51,10 @@ We talk about our visualization on relationships and also how should present the
 
 ### Fifth meeting - November 2
 #### To do list
--Displaying Agenda for relationship.
--Implementing time series.
--Implementing the opacity for the words with same frequency.
--Data set for Huffington.
+- Displaying Agenda for relationship.
+- Implementing time series.
+- Implementing the opacity for the words with same frequency.
+- Data set for Huffington.
 
 
 
