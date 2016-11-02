@@ -43,12 +43,18 @@ the next meeting is Monday at 11am
 
 ### Fourth meeting - October 31
 #### Timeseries data
-We talk about our visualization on relationships and also how should present the time-series
+We talk about our visualization on relationships and also how should present the time-series.
 ##### Action List
 - [ ] Sonia is working on relationship, adding agenda, when click what should appears.
 - [ ] Brindivani is working on montly term frequency
 - [ ] Arun is working on time series and frequency
 
+### Fifth meeting - November 2
+#### To do list
+-Displaying Agenda for relationship.
+-Implementing time series.
+-Implementing the opacity for the words with same frequency.
+-Data set for Huffington.
 
 
 
