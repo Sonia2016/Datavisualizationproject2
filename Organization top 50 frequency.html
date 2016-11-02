@@ -3,15 +3,36 @@
 <head>
   <meta charset="utf-8">
   <title></title>
+  <style>
+.button {
+    background-color: #b8860b;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+	height:40px;
+    width:150px;
+}
+.button2 {background-color: #008CBA;} /* Blue */
+.button3 {background-color: #f44336;} /* Red */
+.button4 {background-color: green;} /* Gray */
+</style>
 </head>
 <body>
+<div style = "float:left; width: 10;">
+	<br><br><br><br><br>
+	<button class="button" onclick=set_color("#b8860b",1)>    Person   </button><br>
+	<button class="button button2" onclick=set_color("#008CBA",3)>   Location  </button><br>
+	<button class="button button3" onclick=set_color("#f44336",0)>Organization </button><br>
+	<button class="button button4" onclick=set_color("green",2)>Miscellaneous</button>
+</div>
 <div>
-	
-	<button type="button" onclick=showNewWords(myWordCloud,1)>Person</button>
-	<button type="button" onclick=showNewWords(myWordCloud,3)>Location</button>
-	<button type="button" onclick=showNewWords(myWordCloud,0)>Organization</button>
-	<button type="button" onclick=showNewWords(myWordCloud,2)>Miscellaneous</button>
-	<div id="chart">	
+	<div id="chart" style = "float:right; width: 85%;">	</div>	
 </div>
 </body>
 
@@ -44,6 +65,13 @@ var empty = function(x) {
   while (x.hasChildNodes())
     x.removeChild(x.lastChild)
   return x
+}
+var color="Red";
+function set_color(c,n)
+{
+	color=c;
+	showNewWords(myWordCloud,n);
+	console.log(color);
 }
 /**
  * @param freq {Object} Frequence of words per length
@@ -161,11 +189,11 @@ d3.tsv("wikinews.tsv", function(error, data) {
 
 
 var words =[""];
-var color="blue";
-var width = 650,
-	height = 550;
+//var color="green";
+var width = 500,
+	height = 500;
 // Encapsulate the word cloud functionality
-function wordCloud(selector,color) {
+function wordCloud(selector) {
 
     var fill = d3.scale.category20();
 	//Construct the word cloud's SVG element
@@ -191,7 +219,7 @@ function wordCloud(selector,color) {
 						cloud.enter()
 						.append("text")
 						.style("font-family", "Impact")
-						.style("stroke", 'gray')
+						//.style("stroke", 'gray')
 						.style("fill", "none")
 						.style("stroke-width", 1)
 						//.style("fill", function(d, i) { return fill(i); })// color
@@ -201,7 +229,9 @@ function wordCloud(selector,color) {
 						.attr("transform", function(d) {
 							return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
 							//return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
-							});
+							})
+						.on("mouseover",function(d){
+						console.log("over "||d.text)});
 
         //Entering and existing words
         cloud
@@ -234,7 +264,7 @@ function wordCloud(selector,color) {
         // of the wordCloud return value.
         update: function(words) {
 		//debugger;
-            d3.layout.cloud().size([500, 600])
+            d3.layout.cloud().size([width, height])
                 .words(words)
                 .padding(2)
                 //.rotate(function() { return ~~(Math.random() * 2) * 90; })
@@ -274,12 +304,14 @@ function showNewWords(vis, i) {
 	words[3]=top50Loc[0];
 	console.log(i);
     vis.update(getWords(i))
+	
+	//console.log(color);
     //vis.update(getWords(i ++ % words.length))
    //setTimeout(function() { showNewWords(vis, i + 1)}, 2000)
 }
 
 //Create a new instance of the word cloud visualisation.
-var myWordCloud = wordCloud('body',color);
+var myWordCloud = wordCloud('body');
 
 //Start cycling through the demo data
 
