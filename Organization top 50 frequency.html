@@ -4,6 +4,39 @@
   <meta charset="utf-8">
   <title></title>
   <style>
+  svg {
+            font-family: "Helvetica Neue", Helvetica;
+        }
+
+        .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
+
 .button {
     background-color: #b8860b;
     border: none;
@@ -20,24 +53,41 @@
 }
 .button2 {background-color: #008CBA;} /* Blue */
 .button3 {background-color: #f44336;} /* Red */
-.button4 {background-color: green;} /* Gray */
+.button4 {background-color: green;} /* Green */
+.button5 {background-color: yellow;} /* Gray */
 </style>
 </head>
 <body>
-<div style = "float:left; width: 10;">
-	<br><br><br><br><br>
-	<button class="button" onclick=set_color("#b8860b",1)>    Person   </button><br>
-	<button class="button button2" onclick=set_color("#008CBA",3)>   Location  </button><br>
-	<button class="button button3" onclick=set_color("#f44336",0)>Organization </button><br>
-	<button class="button button4" onclick=set_color("green",2)>Miscellaneous</button>
-</div>
+
+<center>
 <div>
-	<div id="chart" style = "float:right; width: 85%;">	</div>	
+
+<table>
+	<tr bgcolor="#e82f23">
+		<th colspan="2"><h1>Text and Geospatial visualization<h1></th>
+		
+	</tr>
+	  <tr>
+		<td>
+		<button class="button" onclick=set_color("#b8860b",1)>    Person   </button><br>
+		<button class="button button2" onclick=set_color("#008CBA",3)>   Location  </button><br>
+		<button class="button button3" onclick=set_color("#f44336",0)>Organization </button><br>
+		<button class="button button4" onclick=set_color("green",2)>Miscellaneous</button><br>
+		<button class="button button5" onclick=set_color("",4)>	 ALL     </button>
+		</td>
+		<td>
+			<br>
+			<div id="chart" >	</div>
+		</td>
+	  </tr>
+	</table>
 </div>
+</center>
 </body>
 
 </html>
  <script src="http://d3js.org/d3.v3.min.js"></script>
+ <script src="/d3-tooltip.js"></script>
  <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
 <script>
 	/*jshint asi:true laxcomma:true expr:true boss:true eqnull:true*/
@@ -145,7 +195,6 @@ d3.tsv("wikinews.tsv", function(error, data) {
 		topPerson.push(blogs[b].values[i].person.split('|'));
 	}
   }
-  //debugger;
   topOrganization = frequency(topOrganization);
   topPerson = frequency(topPerson);
   topLocation = frequency(topLocation);
@@ -187,11 +236,13 @@ d3.tsv("wikinews.tsv", function(error, data) {
 	showNewWords(myWordCloud);
 });
 
+ 
 
 var words =[""];
 //var color="green";
 var width = 500,
 	height = 500;
+	var tooltip_val=0;
 // Encapsulate the word cloud functionality
 function wordCloud(selector) {
 
@@ -203,7 +254,12 @@ function wordCloud(selector) {
 			.attr("width", width )
 			.attr("height", height)
 			.append("g");
-			
+	
+	var lineTip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-5, 0])
+            .html(""+tooltip_val);
+	
 		var borderPath = svg.append("rect")
        			.attr("width", width)
 				.attr("height", height)
@@ -211,6 +267,11 @@ function wordCloud(selector) {
        			.style("fill", "none")
        			.style("stroke-width", 2);
 
+				var lineTip = d3.tip()
+									.attr('class', 'd3-tip')
+									.offset([0, 0])
+									//.html(""+((d.size-7)*(d.size-7)));
+							svg.call(lineTip);
 					//svg.append("rect")
     //Draw the word cloud
     function draw(words) {
@@ -230,8 +291,18 @@ function wordCloud(selector) {
 							return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
 							//return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
 							})
-						.on("mouseover",function(d){
-						console.log("over "||d.text)});
+						//.on("mouseover",function(d){
+						//console.log(""+((d.size-7)*(d.size-7)))});
+						.on("mouseover", function (d) {
+									lineTip.html(d.text+" "+((d.size-7)*(d.size-7)));
+									//tooltip_val=((d.size-7)*(d.size-7));
+									lineTip.show();
+									
+								  
+							  })
+							  .on("mouseout", function (d) {
+								  lineTip.hide()
+							  })
 
         //Entering and existing words
         cloud
@@ -272,7 +343,7 @@ function wordCloud(selector) {
                 .font("Impact")
                 .fontSize(function(d) { return d.size; })
                 .on("end", draw)
-                .start();
+				.start();
         }
     }
 
@@ -288,7 +359,8 @@ function getWords(i) {
 				//var s=d.substring(d.indexOf("*")+1);
 				//console.log(d+"  "+d.substring(0,d.indexOf("*")));
 				//return {text: d, size: 10 + Math.random() * 60};
-				return {text: d.substring(0,d.indexOf("*")), size: (((d.substring(d.indexOf("*")+1))/100)+15)};
+				//return {text: d.substring(0,d.indexOf("*")), size: (((d.substring(d.indexOf("*")+1))/100)+15)};
+				return {text: d.substring(0,d.indexOf("*")), size: Math.sqrt(d.substring(d.indexOf("*")+1))+7};
             })
 }
 
@@ -298,10 +370,11 @@ function getWords(i) {
 function showNewWords(vis, i) {
     i = i || 0;
     //i = array_value;
-	words[0]=top50Org[0]
+	words[0]=top50Org[0];
 	words[1]=top50Per[0]
 	words[2]=top50Mis[0]
 	words[3]=top50Loc[0];
+	words[4]=top50Org[0]+top50Per[0]+top50Mis[0]+top50Loc[0];
 	console.log(i);
     vis.update(getWords(i))
 	
