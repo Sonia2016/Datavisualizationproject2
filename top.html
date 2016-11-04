@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style>
+  svg {
+            font-family: "Helvetica Neue", Helvetica;
+        }
+
+        .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
+
+.button {
+    background-color: #b8860b;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+	height:40px;
+    width:150px;
+}
+.button2 {background-color: #008CBA;} /* Blue */
+.button3 {background-color: #f44336;} /* Red */
+.button4 {background-color: green;} /* Green */
+.button5 {background-color: yellow;} /* Gray */
+</style>
+</head>
+<body>
+
+<center>
+<div>
+
+<table>
+	<tr bgcolor="#e82f23">
+		<th colspan="2"><h1>Text and Geospatial visualization<h1></th>
+		
+	</tr>
+	  <tr>
+		<td>
+		<button class="button" onclick=set_color("#b8860b",1)>    Person   </button><br>
+		<button class="button button2" onclick=set_color("#008CBA",3)>   Location  </button><br>
+		<button class="button button3" onclick=set_color("#f44336",0)>Organization </button><br>
+		<button class="button button4" onclick=set_color("green",2)>Miscellaneous</button><br>
+		<button class="button button5" onclick=set_color("",4)>	 ALL     </button>
+		</td>
+		<td>
+			<br>
+			<div id="chart" >	</div>
+		</td>
+	  </tr>
+	</table>
+</div>
+</center>
+</body>
+
+</html>
+ <script src="http://d3js.org/d3.v3.min.js"></script>
+ <script src="/d3-tooltip.js"></script>
+ <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+<script>
+	/*jshint asi:true laxcomma:true expr:true boss:true eqnull:true*/
+var doc = document
+var extend = function(a, b) {
+  Object.keys(b).forEach(function(k){a[k] = b[k]})
+  return a
+}
+var elem = function(tag, props) {
+  return extend(doc.createElement(tag), props)
+}
+/**
+ * @param words {Array}
+ * @returns {Object} Frequency of words per length
+ */
+var frequency = function(words) {
+  return words.filter(Boolean).reduce(function(acc, x) {
+    for(var i = 0 ; i < x.length; i++){
+      if(x[i] != "")
+       acc[x[i]] = ++acc[x[i]] || 1;}
+      return acc;
+  },{})
+}
+var empty = function(x) {
+  while (x.hasChildNodes())
+    x.removeChild(x.lastChild)
+  return x
+}
+var color="Red";
+function set_color(c,n)
+{
+	color=c;
+	showNewWords(myWordCloud,n);
+	console.log(color);
+}
+/**
+ * @param freq {Object} Frequence of words per length
+ * @returns {Node} Document fragment
+ */
+var max = 0;
+var array_value=0;
+function assign_array_value(i)
+{
+	array_value=i;
+	showNewWords(myWordCloud, i);
+}
+var resultOf = function(freq) {
+  return Object.keys(freq).reduce(function(frag, k) {
+    frag.appendChild(elem('p', {
+        textContent: 'Words with '+ k +' chars: '+ freq[k]
+    }))
+    return frag
+  }, doc.createDocumentFragment())
+}
+var textarea = doc.getElementById('text')
+var button = doc.getElementById('analyse')
+var result = doc.getElementById('results')
+function highFrequency(words){
+  var wordfreq = {};
+  var higwords;
+  var max = 0 ; 
+   for(var i = 0 ; i < 50 ; i++){
+    for(var w in words){
+          if(words[w] > max){
+            max = words[w];
+            higwords = w;
+            wordfreq[higwords] = max;
+          }
+        }
+        delete words[higwords];
+        max = 0;
+   }
+  return wordfreq;
+}
+var blogs;
+var topOrganization = [];
+var topPerson = [];
+var topLocation = [];
+var topMiscellaneous = [];
+var top50Org =[""];
+var top50Per =[""];
+var top50Loc =[""];
+var top50Mis =[""];
+d3.tsv("wikinews.tsv", function(error, data) {
+  data.forEach(function(d) {
+      d.time = d3.time.format("%Y-%m-%d").parse(d.time.slice(0,10));
+    });
+ 
+  blogs =  d3.keys(data[0]).slice(1).map(function(id) {
+    return {
+      id: id,
+      values: data.map(function(d) {
+        return {time: d.time, person: d.person, location:d.location, organization:d.organization, miscellaneous:d.miscellaneous};
+      })
+    };
+  });
+  // console.log(blogs);
+  for(var b in blogs){
+    for(var i = 0 ; i < blogs[b].values.length; i++){
+		var dat = new Date(blogs[b].values[i].time);
+		var dd=dat.getDate()+""+dat.getMonth()+""+dat.getFullYear();
+		topOrganization.push(blogs[b].values[i].organization.split('|'));
+		topLocation.push(blogs[b].values[i].location.split('|'));
+		topMiscellaneous.push(blogs[b].values[i].miscellaneous.split('|'));
+		topPerson.push(blogs[b].values[i].person.split('|'));
+	}
+  }
+  topOrganization = frequency(topOrganization);
+  topPerson = frequency(topPerson);
+  topLocation = frequency(topLocation);
+  topMiscellaneous = frequency(topMiscellaneous);
+  top50Location = highFrequency(topLocation);
+  top50Person = highFrequency(topPerson);
+  top50Miscellaneous = highFrequency(topMiscellaneous);
+  top50Organization =  highFrequency(topOrganization);
+  
+  console.log(top50Location);
+  console.log(top50Person);
+  console.log(top50Miscellaneous);
+  console.log(top50Organization);
+	
+	// For loop to put hashmap data into the array
+	for (var key in top50Location)
+	{
+		top50Loc[0]=top50Loc[0]+""+key+"*"+top50Location[key]+"|";
+		
+	}
+	for (var key in top50Person)
+	{
+		top50Per[0]=top50Per[0]+""+key+"*"+top50Person[key]+"|";
+	}
+	for (var key in top50Miscellaneous)
+	{
+		top50Mis[0]=top50Mis[0]+""+key+"*"+top50Miscellaneous[key]+"|";
+	}
+	for (var key in top50Organization)
+	{
+		top50Org[0]=top50Org[0]+""+key+"*"+top50Organization[key]+"|";
+	}
+	
+	//save_content_to_file("asdasdasd", "D:\TTU\Visuals\Project_2\testaa");
+	console.log("Org "+top50Org[0]);
+	//console.log("Per "+top50Per[0]);
+	//console.log("Loc "+top50Loc[0]);
+	//console.log("Mis "+top50Mis[0]);
+	showNewWords(myWordCloud);
+});
+
+ 
+
+var words =[""];
+//var color="green";
+var width = 500,
+	height = 500;
+	var tooltip_val=0;
+// Encapsulate the word cloud functionality
+function wordCloud(selector) {
+
+    var fill = d3.scale.category20();
+	//Construct the word cloud's SVG element
+    var svg = d3.select(chart)
+			.append("svg")
+			.attr("border",2)
+			.attr("width", width )
+			.attr("height", height)
+			.append("g");
+	
+	var lineTip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-5, 0])
+            .html(""+tooltip_val);
+	
+		var borderPath = svg.append("rect")
+       			.attr("width", width)
+				.attr("height", height)
+       			.style("stroke", 'gray')
+       			.style("fill", "none")
+       			.style("stroke-width", 2);
+
+				var lineTip = d3.tip()
+									.attr('class', 'd3-tip')
+									.offset([0, 0])
+									//.html(""+((d.size-7)*(d.size-7)));
+							svg.call(lineTip);
+					//svg.append("rect")
+    //Draw the word cloud
+    function draw(words) {
+        var cloud = svg.selectAll("g text")
+                        .data(words, function(d) { return d.text; })
+						cloud.enter()
+						.append("text")
+						.style("font-family", "Impact")
+						//.style("stroke", 'gray')
+						.style("fill", "none")
+						.style("stroke-width", 1)
+						//.style("fill", function(d, i) { return fill(i); })// color
+						.style("fill",color)// color
+						.attr("text-anchor", "middle")
+						.attr("opacity",function (d) {
+							console.log(.2+(d.size/100));
+							//return (.3+(d.size%10)/10);
+							return (.2+(d.size/100));
+						})
+						.text(function(d) { return d.text; })
+						.attr("transform", function(d) {
+							return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
+							})
+						.on("mouseover", function (d) {
+									lineTip.html(d.text+" "+((d.size-7)*(d.size-7)));
+									lineTip.show();
+							})
+						.on("mouseout", function (d) {
+								  lineTip.hide()
+							  })
+
+        //Entering and existing words
+        cloud
+            .transition()
+                .duration(600)
+                .style("font-size", function(d) { return d.size + "px"; })
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
+                    //return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
+                })
+                .style("fill-opacity", 1);
+
+        //Exiting words
+        cloud.exit()
+            .transition()
+                .duration(200)
+                .style('fill-opacity', 1e-6)
+                .attr('font-size', 1)
+                .remove();
+    }
+
+
+    //Use the module pattern to encapsulate the visualisation code. We'll
+    // expose only the parts that need to be public.
+    return {
+
+        //Recompute the word cloud for a new set of words. This method will
+        // asycnhronously call draw when the layout has been computed.
+        //The outside world will need to call this function, so make it part
+        // of the wordCloud return value.
+        update: function(words) {
+		//debugger;
+            d3.layout.cloud().size([width, height])
+                .words(words)
+                .padding(2)
+                //.rotate(function() { return ~~(Math.random() * 2) * 90; })
+                .rotate(0)
+                .font("Impact")
+                .fontSize(function(d) { return d.size; })
+                .on("end", draw)
+				.start();
+        }
+    }
+
+}
+
+//Prepare one of the sample sentences by removing punctuation,
+// creating an array of words and computing a random size attribute.
+function getWords(i) {
+	return words[i]
+            .replace(/[!\.,:;\?"']/g, '')
+            .split('|')
+            .map(function(d) {
+				//var s=d.substring(d.indexOf("*")+1);
+				//console.log(d+"  "+d.substring(0,d.indexOf("*")));
+				//return {text: d, size: 10 + Math.random() * 60};
+				//return {text: d.substring(0,d.indexOf("*")), size: (((d.substring(d.indexOf("*")+1))/100)+15)};
+				return {text: d.substring(0,d.indexOf("*")), size: Math.sqrt(d.substring(d.indexOf("*")+1))+7};
+            })
+}
+
+//This method tells the word cloud to redraw with a new set of words.
+//In reality the new words would probably come from a server request,
+// user input or some other source.
+function showNewWords(vis, i) {
+    i = i || 0;
+    //i = array_value;
+	words[0]=top50Org[0];
+	words[1]=top50Per[0]
+	words[2]=top50Mis[0]
+	words[3]=top50Loc[0];
+	words[4]=top50Org[0]+top50Per[0]+top50Mis[0]+top50Loc[0];
+	console.log(i);
+    vis.update(getWords(i))
+	
+	//console.log(color);
+    //vis.update(getWords(i ++ % words.length))
+   //setTimeout(function() { showNewWords(vis, i + 1)}, 2000)
+}
+
+//Create a new instance of the word cloud visualisation.
+var myWordCloud = wordCloud('body');
+
+//Start cycling through the demo data
+
+
+</script>
