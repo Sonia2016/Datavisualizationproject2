@@ -56,6 +56,8 @@
 .button4 {background-color: green;} /* Green */
 .button5 {background-color: yellow;} /* Gray */
 </style>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 </head>
 <body>
 
@@ -78,6 +80,12 @@
 		<td>
 			<br>
 			<div id="chart" >	</div>
+			 <p>
+			  <label for="amount">Date range:</label>
+			  <input type="text" id="amount" style="border: 0; color: #f6931f; font-weight: bold;" size="70"/>
+			</p>
+			 
+			<div id="slider-range"></div>
 		</td>
 	  </tr>
 	</table>
@@ -86,6 +94,10 @@
 </body>
 
 </html>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
  <script src="http://d3js.org/d3.v3.min.js"></script>
  <script src="/d3-tooltip.js"></script>
  <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
@@ -240,7 +252,7 @@ d3.tsv("wikinews.tsv", function(error, data) {
 
 var words =[""];
 //var color="green";
-var width = 500,
+var width = 600,
 	height = 500;
 	var tooltip_val=0;
 // Encapsulate the word cloud functionality
@@ -286,21 +298,20 @@ function wordCloud(selector) {
 						//.style("fill", function(d, i) { return fill(i); })// color
 						.style("fill",color)// color
 						.attr("text-anchor", "middle")
+						.attr("opacity",function (d) {
+							console.log(.2+(d.size/100));
+							//return (.3+(d.size%10)/10);
+							return (.2+(d.size/100));
+						})
 						.text(function(d) { return d.text; })
 						.attr("transform", function(d) {
-							return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
-							//return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
+							return "translate(" + [d.x+300, d.y+250] + ")rotate(" + d.rotate + ")";
 							})
-						//.on("mouseover",function(d){
-						//console.log(""+((d.size-7)*(d.size-7)))});
 						.on("mouseover", function (d) {
 									lineTip.html(d.text+" "+((d.size-7)*(d.size-7)));
-									//tooltip_val=((d.size-7)*(d.size-7));
 									lineTip.show();
-									
-								  
-							  })
-							  .on("mouseout", function (d) {
+							})
+						.on("mouseout", function (d) {
 								  lineTip.hide()
 							  })
 
@@ -310,7 +321,7 @@ function wordCloud(selector) {
                 .duration(600)
                 .style("font-size", function(d) { return d.size + "px"; })
                 .attr("transform", function(d) {
-                    return "translate(" + [d.x+250, d.y+250] + ")rotate(" + d.rotate + ")";
+                    return "translate(" + [d.x+300, d.y+250] + ")rotate(" + d.rotate + ")";
                     //return "translate(" + [d.x, d.y] + ")";//rotate(" + d.rotate + ")";
                 })
                 .style("fill-opacity", 1);
@@ -388,5 +399,20 @@ var myWordCloud = wordCloud('body');
 
 //Start cycling through the demo data
 
-
+  $(function() {
+    $( "#slider-range" ).slider({
+      range: true,
+      min: new Date('2010.01.01').getTime() / 1000,
+      max: new Date('2014.01.01').getTime() / 1000,
+      step: 86400,
+      values: [ new Date('2010.01.01').getTime() / 1000, new Date('2014.01.01').getTime() / 1000 ],
+      slide: function( event, ui ) {
+		$start_date=new Date(ui.values[ 0 ] *1000);
+		$end_date=new Date(ui.values[ 1 ] *1000)
+        $( "#amount" ).val( ($start_date.getMonth()+1)+"/"+($start_date.getDate())+"/"+($start_date.getFullYear()) +"-"+ ($end_date.getMonth()+1)+"/"+($end_date.getDate())+"/"+($end_date.getFullYear()));
+      }
+    });
+    $( "#amount" ).val( (new Date($( "#slider-range" ).slider( "values", 0 )*1000).toDateString()) +
+      " - " + (new Date($( "#slider-range" ).slider( "values", 1 )*1000)).toDateString());
+  });
 </script>
