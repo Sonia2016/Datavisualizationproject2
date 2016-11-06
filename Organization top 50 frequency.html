@@ -396,7 +396,10 @@ function showNewWords(vis, i) {
 
 //Create a new instance of the word cloud visualisation.
 var myWordCloud = wordCloud('body');
-
+function disply(s,d)
+{
+	console.log(s+"   "+d);
+}
 //Start cycling through the demo data
 
   $(function() {
@@ -407,12 +410,16 @@ var myWordCloud = wordCloud('body');
       step: 86400,
       values: [ new Date('2010.01.01').getTime() / 1000, new Date('2014.01.01').getTime() / 1000 ],
       slide: function( event, ui ) {
-		$start_date=new Date(ui.values[ 0 ] *1000);
-		$end_date=new Date(ui.values[ 1 ] *1000)
-        $( "#amount" ).val( ($start_date.getMonth()+1)+"/"+($start_date.getDate())+"/"+($start_date.getFullYear()) +"-"+ ($end_date.getMonth()+1)+"/"+($end_date.getDate())+"/"+($end_date.getFullYear()));
+		$d0=new Date(ui.values[ 0 ] *1000);
+		$d1=new Date(ui.values[ 1 ] *1000);
+		$start_date=($d0.getMonth()+1)+"/"+($d0.getDate())+"/"+($d0.getFullYear());
+		$end_date=($d1.getMonth()+1)+"/"+($d1.getDate())+"/"+($d1.getFullYear());
+        $( "#amount" ).val( $start_date+"-"+ $end_date);
+		 disply($start_date,$end_date);
       }
     });
     $( "#amount" ).val( (new Date($( "#slider-range" ).slider( "values", 0 )*1000).toDateString()) +
       " - " + (new Date($( "#slider-range" ).slider( "values", 1 )*1000)).toDateString());
+	
   });
 </script>
