@@ -111,6 +111,7 @@ var extend = function(a, b) {
 var elem = function(tag, props) {
   return extend(doc.createElement(tag), props)
 }
+
 /**
  * @param words {Array}
  * @returns {Object} Frequency of words per length
@@ -118,8 +119,9 @@ var elem = function(tag, props) {
 var frequency = function(words) {
   return words.filter(Boolean).reduce(function(acc, x) {
     for(var i = 0 ; i < x.length; i++){
-      if(x[i] != "")
-       acc[x[i]] = ++acc[x[i]] || 1;}
+      if(x[i] != "" || x[i].includes(' ')){
+        x[i] = x[i].replace(/'/gi, "");
+          acc[x[i]] = ++acc[x[i]] || 1;}}
       return acc;
   },{})
 }
@@ -135,11 +137,29 @@ function set_color(c,n)
 	showNewWords(myWordCloud,n);
 	console.log(color);
 }
+function sortObject(obj) {
+    var arr = [];
+    var prop;
+    for (prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            arr.push({
+                'key': prop,
+                'value': obj[prop]
+            });
+        }
+    }
+    arr.sort(function(a, b) {
+        return a.value - b.value;
+    });
+    return arr; // returns array
+}
+
 /**
  * @param freq {Object} Frequence of words per length
  * @returns {Node} Document fragment
  */
-var max = 0;
+var words =[""];
+ var max = 0;
 var array_value=0;
 function assign_array_value(i)
 {
@@ -154,26 +174,19 @@ var resultOf = function(freq) {
     return frag
   }, doc.createDocumentFragment())
 }
-var textarea = doc.getElementById('text')
-var button = doc.getElementById('analyse')
-var result = doc.getElementById('results')
-function highFrequency(words){
+
+
+function highFrequency(words,times){
   var wordfreq = {};
   var higwords;
   var max = 0 ; 
-   for(var i = 0 ; i < 50 ; i++){
-    for(var w in words){
-          if(words[w] > max){
-            max = words[w];
-            higwords = w;
-            wordfreq[higwords] = max;
-          }
-        }
-        delete words[higwords];
-        max = 0;
+  words = sortObject(words);
+
+   for(var i = words.length - times ; i <  words.length; i++){
+        wordfreq[words[i].key] = words[i].value;
    }
   return wordfreq;
-}
+} 
 var blogs;
 var topOrganization = [];
 var topPerson = [];
@@ -183,11 +196,17 @@ var top50Org =[""];
 var top50Per =[""];
 var top50Loc =[""];
 var top50Mis =[""];
+//var timeformat = d3.time.format("%m-%d-%Y");
 d3.tsv("wikinews.tsv", function(error, data) {
+
   data.forEach(function(d) {
-      d.time = d3.time.format("%Y-%m-%d").parse(d.time.slice(0,10));
+     var date=(d.time.slice(0,7)).replace('-', '');
+	  //console.log(date);
+	  d.time = date;
+	  //debugger;
     });
- 
+
+
   blogs =  d3.keys(data[0]).slice(1).map(function(id) {
     return {
       id: id,
@@ -196,40 +215,302 @@ d3.tsv("wikinews.tsv", function(error, data) {
       })
     };
   });
+
   // console.log(blogs);
-  for(var b in blogs){
-    for(var i = 0 ; i < blogs[b].values.length; i++){
-		var dat = new Date(blogs[b].values[i].time);
-		var dd=dat.getDate()+""+dat.getMonth()+""+dat.getFullYear();
-		topOrganization.push(blogs[b].values[i].organization.split('|'));
-		topLocation.push(blogs[b].values[i].location.split('|'));
-		topMiscellaneous.push(blogs[b].values[i].miscellaneous.split('|'));
-		topPerson.push(blogs[b].values[i].person.split('|'));
-	}
+  
+var topOrganization = [];
+var topPerson = [];
+var topLocation = [];
+var topMiscellaneous = [];
+
+
+  blogs.forEach(function(a){
+      a.values.sort(function(c,d){
+        if(c.time>d.time) return 1;
+        else if(c.time<d.time) return -1;
+        else return 0;
+      });
+    
+  });
+
+  
+  b = 0;
+  for(var i = 0 ; i < blogs[b].values.length; i++){
+	blogs[b].values[i].person = blogs[b].values[i].person.split('|');
+    blogs[b].values[i].location = blogs[b].values[i].location.split('|');
+    blogs[b].values[i].miscellaneous = blogs[b].values[i].miscellaneous.split('|');
+    blogs[b].values[i].organization = blogs[b].values[i].organization.split('|');
+    topOrganization.push(blogs[b].values[i].organization);
+    topLocation.push(blogs[b].values[i].location);
+    topMiscellaneous.push(blogs[b].values[i].miscellaneous);
+    topPerson.push(blogs[b].values[i].person);
   }
+ 
+
+  //Frequency of each element
   topOrganization = frequency(topOrganization);
   topPerson = frequency(topPerson);
   topLocation = frequency(topLocation);
   topMiscellaneous = frequency(topMiscellaneous);
-  top50Location = highFrequency(topLocation);
-  top50Person = highFrequency(topPerson);
-  top50Miscellaneous = highFrequency(topMiscellaneous);
-  top50Organization =  highFrequency(topOrganization);
+
   
-  console.log(top50Location);
-  console.log(top50Person);
-  console.log(top50Miscellaneous);
-  console.log(top50Organization);
-	
-	// For loop to put hashmap data into the array
-	for (var key in top50Location)
-	{
-		top50Loc[0]=top50Loc[0]+""+key+"*"+top50Location[key]+"|";
-		
+   //top 50 frequency of each categories
+  top50Location = highFrequency(topLocation,100);
+  top50Person = highFrequency(topPerson,100);
+  top50Miscellaneous = highFrequency(topMiscellaneous,50);
+  top50Organization =  highFrequency(topOrganization,100);
+ 
+
+
+lt = {};
+
+for(var i = 0 ; i < blogs[0].values.length;i++){
+  var temp = []
+  for(var l in top50Location){
+    if(blogs[0].values[i].location.includes(l))
+    {
+      if(lt[blogs[0].values[i].time]== undefined)
+        {temp.push(l);
+          lt[blogs[0].values[i].time] = temp;
+          lt[blogs[0].values[i].time][l] = 1;
+        }
+      else
+        { if(lt[blogs[0].values[i].time].includes(l))
+             lt[blogs[0].values[i].time][l] =  lt[blogs[0].values[i].time][l] + 1;
+             else
+              {
+                lt[blogs[0].values[i].time].push(l);
+                lt[blogs[0].values[i].time][l] = 1;
+              }
+            }
+          }
+        }
+    }
+
+	pt = {};
+	for(var i = 0 ; i < blogs[0].values.length;i++){
+	  var temp = []
+	  
+	  for(var l in top50Person){
+		if(blogs[0].values[i].person.includes(l))
+		{
+		  if(pt[blogs[0].values[i].time]== undefined)
+			{temp.push(l);
+			  pt[blogs[0].values[i].time] = temp;
+			  pt[blogs[0].values[i].time][l] = 1;
+			}
+		  else
+			{ if(pt[blogs[0].values[i].time].includes(l))
+				 pt[blogs[0].values[i].time][l] =  pt[blogs[0].values[i].time][l] + 1;
+				 else
+				  {
+					pt[blogs[0].values[i].time].push(l);
+					pt[blogs[0].values[i].time][l] = 1;
+				  }
+				}
+			  }
+			}
 	}
-	for (var key in top50Person)
+  
+	var ot={}
+  for(var i = 0 ; i < blogs[0].values.length;i++){
+	  
+	  var temp = []
+	  for(var l in top50Organization){
+		if(blogs[0].values[i].organization.includes(l))
+		{
+		  if(ot[blogs[0].values[i].time]== undefined)
+			{temp.push(l);
+			  ot[blogs[0].values[i].time] = temp;
+			  ot[blogs[0].values[i].time][l] = 1;
+			}
+		  else
+			{ if(ot[blogs[0].values[i].time].includes(l))
+				 ot[blogs[0].values[i].time][l] =  ot[blogs[0].values[i].time][l] + 1;
+				 else
+				  {
+					ot[blogs[0].values[i].time].push(l);
+					ot[blogs[0].values[i].time][l] = 1;
+				  }
+				}
+			  }
+			}
+			//debugger;
+    }
+
+	var mt={}
+	for(var i = 0 ; i < blogs[0].values.length;i++){
+		var temp = []
+
+		for(var l in top50Miscellaneous){
+		if(blogs[0].values[i].miscellaneous.includes(l))
+		{
+		  if(mt[blogs[0].values[i].time]== undefined)
+			{temp.push(l);
+			  mt[blogs[0].values[i].time] = temp;
+			  mt[blogs[0].values[i].time][l] = 1;
+			}
+		  else
+			{ if(mt[blogs[0].values[i].time].includes(l))
+				 mt[blogs[0].values[i].time][l] =  mt[blogs[0].values[i].time][l] + 1;
+				 else
+				  {
+					mt[blogs[0].values[i].time].push(l);
+					mt[blogs[0].values[i].time][l] = 1;
+				  }
+				}
+			  }
+			}
+	}
+	/*
+	var person={};
+	var organization={};
+	var location={};
+	var miscellaneous={};*/
+	//debugger;
+	// For loop to put hashmap data into the array
+	//console.log(pt);
+	for(var key in pt)
 	{
-		top50Per[0]=top50Per[0]+""+key+"*"+top50Person[key]+"|";
+		for(var i in pt[key])
+		{
+			var temp = pt[key][pt[key][i]];
+			if( !isNaN(temp))
+			{
+				/*debugger;
+				console.log("in");
+				top50Per[0]=top50Per[0]+""+key+" "+pt[key][i]+"*"+temp;
+				//date=new Date(key);
+				if(person[key]== undefined)
+					person[key]=[];
+				person[key].push(pt[key][i]+"*"+temp+"|");*/
+				words[1]=words[1]+""+key+"*"+pt[key][i]+"*"+pt[key][pt[key][i]]+"|";
+			}	
+		}
+	}
+
+	/*for(var i in person)
+	{
+		//debugger;
+		for(var key in person[key])
+			words[1]=words[1]+""+i+"*"+person[i][key];
+		console.log(i+"*"+person[i]);
+	}*/
+	//console.log(words[1]);
+	for(var key in lt)
+	{
+		for(var i in lt[key])
+		{
+			var temp = lt[key][lt[key][i]];
+			if( !isNaN(temp))
+			{
+				/*top50Loc[0]=top50Loc[0]+""+key+" "+lt[key][i]+"*"+temp;
+				//date=new Date(key);
+				if(location[key]== undefined)
+							location[key]=[];
+				location[key].push(lt[key][i]+"*"+temp+"|");*/
+				words[3]=words[3]+""+key+"*"+lt[key][i]+"*"+lt[key][lt[key][i]]+"|";
+			}	
+		}
+	}
+	/*for(var i in location)
+	{
+		words[3]=words[3]+""+i+"*"+location[i];
+	}*/
+	for(var key in mt)
+	{
+		for(var i in mt[key])
+		{
+			var temp = mt[key][mt[key][i]];
+			if( !isNaN(temp))
+			{
+				/*top50Mis[0]=top50Mis[0]+""+key+" "+mt[key][i]+"*"+temp;
+				//date=new Date(key);
+				if(miscellaneous[key]== undefined)
+							miscellaneous[key]=[];
+				miscellaneous[key].push(mt[key][i]+"*"+temp+"|");*/
+				words[2]=words[2]+""+key+"*"+mt[key][i]+"*"+mt[key][mt[key][i]]+"|";
+			}	
+		}
+	}
+	/*for(var i in miscellaneous)
+	{
+		words[2]=words[2]+""+i+"*"+miscellaneous[i];
+	}*/
+	for(var key in ot)
+	{
+		for(var i in ot[key])
+		{
+			var temp = ot[key][ot[key][i]];
+			if( !isNaN(temp))
+			{
+				/*top50Org[0]=top50Org[0]+""+key+" "+ot[key][i]+"*"+temp;
+				//date=new Date(key);
+				if(organization[key]== undefined)
+							organization[key]=[];
+				organization[key].push(ot[key][i]+"*"+temp+"|");*/
+				words[0]=words[0]+""+key+"*"+ot[key][0]+"*"+ot[key][ot[key][0]]+"|";
+			}	
+		}
+			//console.log(key+" "+organization[key]);
+	}
+	/*
+	for(var i in organization)
+	{
+		words[0]=words[0]+""+i+"*"+organization[i];
+	}*/
+	//console.log(words[0]);
+	//console.log(words[1]);
+	//console.log(words[2]);
+	//console.log(words[3]);
+	/*
+	for(var key in ot)
+	{
+		for (var i in ot[key])
+		{
+			var temp = ot[key][ot[key][i]];
+			//debugger;
+			if( !isNaN(temp))
+			{
+				//console.log(""+key+" "+ot[key][i]+" "+temp)
+				top50Org[0]=top50Org[0]+""+key+" "+ot[key][i]+"*"+temp+"|";
+				
+				
+			}	
+			
+		}
+	}
+	for(var key in pt)
+	{
+		for (var i in pt[key])
+		{
+			var temp = pt[key][pt[key][i]];
+			//debugger;
+			if( !isNaN(temp))
+			{
+				//console.log(""+key+" "+pt[key][i]+" "+temp)
+				top50Per[0]=top50Per[0]+""+key+" "+pt[key][i]+"*"+temp+"|";
+			}	
+			
+		}
+	}
+	for(var key in mt)
+	{
+		for (var i in mt[key])
+		{
+			var temp = mt[key][mt[key][i]];
+			//debugger;
+			if( !isNaN(temp))
+			{
+				//console.log(""+key+" "+mt[key][i]+" "+temp)
+				top50Mis[0]=top50Mis[0]+""+key+" "+mt[key][i]+"*"+temp+"|";
+			}	
+			
+		}
+	}*/
+	/*for (var key in pt)
+	{
+		top50Per[0]=top50Per[0]+""+key+"*"+pt[key]+"|";
 	}
 	for (var key in top50Miscellaneous)
 	{
@@ -239,9 +520,9 @@ d3.tsv("wikinews.tsv", function(error, data) {
 	{
 		top50Org[0]=top50Org[0]+""+key+"*"+top50Organization[key]+"|";
 	}
-	
+	*/
 	//save_content_to_file("asdasdasd", "D:\TTU\Visuals\Project_2\testaa");
-	console.log("Org "+top50Org[0]);
+	//console.log("Org "+top50Org[0]);
 	//console.log("Per "+top50Per[0]);
 	//console.log("Loc "+top50Loc[0]);
 	//console.log("Mis "+top50Mis[0]);
@@ -250,7 +531,7 @@ d3.tsv("wikinews.tsv", function(error, data) {
 
  
 
-var words =[""];
+
 //var color="green";
 var width = 600,
 	height = 500;
@@ -299,9 +580,9 @@ function wordCloud(selector) {
 						.style("fill",color)// color
 						.attr("text-anchor", "middle")
 						.attr("opacity",function (d) {
-							console.log(.2+(d.size/100));
+							//console.log(.2+(d.size/100));
 							//return (.3+(d.size%10)/10);
-							return (.2+(d.size/100));
+							return (.2+(d.size/10));
 						})
 						.text(function(d) { return d.text; })
 						.attr("transform", function(d) {
@@ -363,6 +644,7 @@ function wordCloud(selector) {
 //Prepare one of the sample sentences by removing punctuation,
 // creating an array of words and computing a random size attribute.
 function getWords(i) {
+	//debugger;
 	return words[i]
             .replace(/[!\.,:;\?"']/g, '')
             .split('|')
@@ -371,7 +653,21 @@ function getWords(i) {
 				//console.log(d+"  "+d.substring(0,d.indexOf("*")));
 				//return {text: d, size: 10 + Math.random() * 60};
 				//return {text: d.substring(0,d.indexOf("*")), size: (((d.substring(d.indexOf("*")+1))/100)+15)};
-				return {text: d.substring(0,d.indexOf("*")), size: Math.sqrt(d.substring(d.indexOf("*")+1))+7};
+				//debugger;
+				if(d!='')
+				{
+					var a=d.split('*')
+					//console.log(d);
+					var aa=a[0];
+					if( aa > min_date && aa < max_date)
+					{
+						return {text: d.split('*')[1], size: ((a[2])*2)+10};
+					}
+					else
+						return {text: "a", size: 0};
+				}
+				else
+					return {text: "a", size: 0};
             })
 }
 
@@ -380,13 +676,15 @@ function getWords(i) {
 // user input or some other source.
 function showNewWords(vis, i) {
     i = i || 0;
-    //i = array_value;
-	words[0]=top50Org[0];
-	words[1]=top50Per[0]
-	words[2]=top50Mis[0]
-	words[3]=top50Loc[0];
-	words[4]=top50Org[0]+top50Per[0]+top50Mis[0]+top50Loc[0];
-	console.log(i);
+    //words[0]=top50Org[0];
+	//words[1]=top50Per[0]
+	//words[2]=top50Mis[0]
+	//words[3]=top50Loc[0];
+	//words[4]=top50Org[0]+top50Per[0]+top50Mis[0]+top50Loc[0];
+	//console.log(i);
+	//console.log("*******************************************************"+words[i]);
+	//console.log("*******************************************************");
+    //vis.update(getWords(i))
     vis.update(getWords(i))
 	
 	//console.log(color);
@@ -396,30 +694,61 @@ function showNewWords(vis, i) {
 
 //Create a new instance of the word cloud visualisation.
 var myWordCloud = wordCloud('body');
-function disply(s,d)
+var min_date="200411";
+var max_date="201610";
+function disply(sm,sy,em,ey)
 {
-	console.log(s+"   "+d);
+	console.log(sm);
+	var sm=sm;
+	var sy=sy;
+	var em=em;
+	var ey=ey;
+	if((sm.length)==1)
+		sm="0"+sm;
+	if((em.length)==1)
+		em="0"+em
+	d=d3.time.format("%m/%d/%Y").parse;
+	d1=d3.time.format("%Y-%m-%d").parse;
+	min_date=sy+""+sm;
+	max_date=ey+""+em;
+	asd();
+	showNewWords(myWordCloud, 1);
+}
+function asd()
+{
+	console.log(min_date+" "+max_date);
 }
 //Start cycling through the demo data
 
   $(function() {
     $( "#slider-range" ).slider({
       range: true,
-      min: new Date('2010.01.01').getTime() / 1000,
-      max: new Date('2014.01.01').getTime() / 1000,
+      min: new Date('2004.11.01').getTime() / 1000,
+      max: new Date('2016.10.01').getTime() / 1000,
       step: 86400,
-      values: [ new Date('2010.01.01').getTime() / 1000, new Date('2014.01.01').getTime() / 1000 ],
+      values: [ new Date('2004.11.01').getTime() / 1000, new Date('2016.10.01').getTime() / 1000 ],
       slide: function( event, ui ) {
 		$d0=new Date(ui.values[ 0 ] *1000);
 		$d1=new Date(ui.values[ 1 ] *1000);
-		$start_date=($d0.getMonth()+1)+"/"+($d0.getDate())+"/"+($d0.getFullYear());
-		$end_date=($d1.getMonth()+1)+"/"+($d1.getDate())+"/"+($d1.getFullYear());
-        $( "#amount" ).val( $start_date+"-"+ $end_date);
-		 disply($start_date,$end_date);
+		$smm=($d0.getMonth()+1);
+		$emm=($d1.getMonth()+1);
+		$sdd=($d0.getDate());
+		$edd=($d1.getDate());
+		$syy=$d0.getFullYear();
+		$eyy=$d1.getFullYear();
+		//console.log($.trim(smm).length);
+//		$min_date=$syy+""+$smm;
+	//	$max_date=$eyy+""+$emm;
+		//$start_date=$smm+"-"+$sdd+"-"+$syy;
+		//$end_date=$emm+"-"+$edd+"-"+$eyy;
+        $( "#amount" ).val( $smm+"/"+$sdd+"/"+$syy+"-"+ $emm+"/"+$edd+"/"+$eyy);
+		//console.log($smm);
+		//debugger;
+		 disply($smm,$syy,$emm,$eyy);
       }
     });
     $( "#amount" ).val( (new Date($( "#slider-range" ).slider( "values", 0 )*1000).toDateString()) +
-      " - " + (new Date($( "#slider-range" ).slider( "values", 1 )*1000)).toDateString());
+      "   -   " + (new Date($( "#slider-range" ).slider( "values", 1 )*1000)).toDateString());
 	
   });
 </script>
