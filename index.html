@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body{
+  font: 300 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  stroke: steelblue;
+  stroke-opacity: .4;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}
+svg{
+    display: block;
+    margin: auto;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #003366;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    padding: 16px;
+    text-decoration: none;
+}
+
+.main {
+    padding: 16px;
+    margin-top: 30px;
+    height: 1500px; /* Used in this example to enable scrolling */
+}
+
+</style>
+<body>
+<ul class="tab">
+  <li><a href="/home.html">Home</a></li>
+  <li><a href="/wordle/wordle.html">Wordle</a></li>
+  <li><a href="/timefrequency.html">Time Frequency</a></li>
+  <li><a href="/hbundle.html">Relationship - huffington</a></li>
+  <li><a href="/wbundle.html">Relationship - wikinews</a></li>
+  <li><a href="/wMap.html">Location map - wikinews</a></li>
+  <li><a href="/hMap.html">Location map - huffington</a></li>
+</ul>
+
+<div class="main">
+<div style="height: 10px; "></div>
+<div >
+<table style="width:100%" align="center">
+    <tr align="center">
+    <th>Source</th>
+    <th>Timeseries/wordle</th>
+    <th>Relationship</th> 
+    <th>Location</th>
+  </tr>
+
+      <tr align="center">
+  <td>Wikinews</td>
+    <td>Eve</td>
+    <td>
+      <a href="/wbundle.html">
+        <img src="relation.png" title="Relationship - wikinews" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
+      </a>
+    </td> 
+    <td>
+      <a href="/wMap.html">
+        <img src="globe.png" title="Location map - wikinews" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
+      </a>
+    </td>
+  </tr>
+      <tr align="center">
+  <td>Huffington</td>
+    <td>Eve</td>
+    <td>
+      <a href="/hbundle.html">
+        <img src="relation.png" title="Relationship - huffington" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
+      </a>
+    </td> 
+    <td>
+      <a href="/hMap.html">
+        <img src="globe.png" title="Location map - huffington" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
+      </a>
+    </td>
+  </tr>
+
+  </tr>
+</table>
+<!-- <p>Text and Geospatial visualization</p>
+<a href="/wMap.html">
+  Location map - wikinews<img src="globe.png" alt="HTML tutorial" style="width:42px;height:42px;border:0;">
+</a>
+<a href="/hMap.html">
+  Location map - huffington<img src="globe.png" alt="HTML tutorial" style="width:42px;height:42px;border:0;">
+</a> -->
+   
+</div>
+
+
+
+
+<script src="//d3js.org/d3.v3.min.js"></script>
