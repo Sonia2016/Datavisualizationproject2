@@ -187,7 +187,7 @@ var nodes;
 var links;
 var termArray = [];
 
-d3.json("/Data/bData.json", function(error, classes) {
+d3.json("https://sonia2016.github.io/Datavisualizationproject2/Data/bData.json", function(error, classes) {
       if (error) throw error;
 
        nodes = cluster.nodes(packageHierarchy(classes)),
