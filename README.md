@@ -79,3 +79,12 @@ We talk about our visualization on relationships and also how should present the
 - [ ] Try to implement the slider for the relationship
 
 ## Initial Visualization
+### Map - wikinews
+![wmap](https://cloud.githubusercontent.com/assets/19417775/20157705/0619dd00-a69c-11e6-8d94-137d25c1ea45.png)
+### Map - huffington
+![hmap](https://cloud.githubusercontent.com/assets/19417775/20157704/0619115e-a69c-11e6-8c7d-dbd3536649e8.png)
+### Relationship - wikinews
+![wrel](https://cloud.githubusercontent.com/assets/19417775/20157706/061a580c-a69c-11e6-9387-248398645c7e.png)
+### Relationship - huffington
+![hrelation](https://cloud.githubusercontent.com/assets/19417775/20157703/060aca0e-a69c-11e6-9647-be5094665be9.png)
+
