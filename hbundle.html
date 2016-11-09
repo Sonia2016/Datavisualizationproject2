@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body{
+  font: 300 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  stroke: steelblue;
+  stroke-opacity: .4;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}
+svg{
+    display: block;
+    margin: auto;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #003366;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    padding: 16px;
+    text-decoration: none;
+}
+
+.main {
+    padding: 16px;
+    margin-top: 30px;
+    height: 1500px; /* Used in this example to enable scrolling */
+}
+
+
+.autocomplete-suggestions { border: 1px solid #999; background: #fff; cursor: default; overflow: auto; }
+.autocomplete-suggestion { padding: 10px 5px; font-size: 1.2em; white-space: nowrap; overflow: hidden; }
+.autocomplete-selected { background: #f0f0f0; }
+.autocomplete-suggestions strong { font-weight: normal; color: #3399ff; }
+
+
+#searchfield { display: block; width: 100%; text-align: center; margin-bottom: 35px; }
+ 
+#searchfield form {
+  display: inline-block;
+  background: #eeefed;
+  padding: 0;
+  margin: 0;
+  padding: 5px;
+  border-radius: 3px;
+  margin: 5px 0 0 0;
+}
+#searchfield form .biginput {
+  width: 150px;
+  height: 20px;
+  padding: 0 10px 0 10px;
+  background-color: #fff;
+  border: 1px solid #c8c8c8;
+  border-radius: 3px;
+  color: #aeaeae;
+  font-weight:normal;
+  font-size: 1em;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+#searchfield form .biginput:focus {
+  color: #858585;
+}
+
+</style>
+<body>
+<ul class="tab">
+  <li><a href="/home.html">Home</a></li>
+  <li><a href="/wordle/wordle.html">Wordle</a></li>
+  <li><a href="/timefrequency.html">Time Frequency</a></li>
+  <li><a href="/hbundle.html">Relationship - huffington</a></li>
+  <li><a href="/wbundle.html">Relationship - wikinews</a></li>
+  <li><a href="/wMap.html">Location map - wikinews</a></li>
+  <li><a href="/hMap.html">Location map - huffington</a></li>
+</ul>
+
+<div class="main">
+<div style="height: 10px; "></div>
+<div align="center">
+<p align="center">wikinews data set, you can write your term here to see the related terms</p>
+
+  <div id="searchfield">
+    <form><input type="text" name="currency" class="biginput" id="autocomplete">
+      <button type="button" onclick="searchNode()">Search</button>
+      <button type="button" onclick="resetNode()">Reset</button>
+    </form>
+  </div><!-- @end #searchfield -->
+  
+
+</div>
+
+<div class="auto">
+  <svg id="net" width="960" height="600" margin="400" style="margin: 0 auto"></svg>
+</div>
+</div>
+
+ <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="jquery.autocomplete.min.js"></script>
+  <script type="text/javascript" src="currency-autocomplete.js"></script>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+var diameter = 760,
+    radius = diameter / 2,
+    innerRadius = radius - 120;
+
+var cluster = d3.layout.cluster()
+    .size([360, innerRadius])
+    .sort(null)
+    .value(function(d) { return d.size; });
+
+var bundle = d3.layout.bundle();
+
+var line = d3.svg.line.radial()
+    .interpolate("bundle")
+    .tension(.85)
+    .radius(function(d) { return d.y; })
+    .angle(function(d) { return d.x / 180 * Math.PI; });
+
+var svg = d3.select("#net")
+    .attr("width", diameter)
+    .attr("height", diameter)
+  .append("g")
+    .attr("transform", "translate(" + radius + "," + radius + ")");
+
+var link = svg.append("g").selectAll(".link"),
+    node = svg.append("g").selectAll(".node");
+
+var nodes;
+var links;
+var termArray = [];
+
+d3.json("/Data/b2Data.json", function(error, classes) {
+      if (error) throw error;
+
+       nodes = cluster.nodes(packageHierarchy(classes)),
+          links = packageImports(nodes);
+
+      link = link
+          .data(bundle(links))
+        .enter().append("path")
+          .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
+          .attr("class", "link")
+          .attr("d", line);
+
+
+      node = node
+          .data(nodes.filter(function(n) { return !n.children; }))
+        .enter().append("text")
+          .attr("class", "node")
+          .attr("dy", ".31em")
+          .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
+          .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+          .text(function(d) { return d.key; })
+          .on("mouseover", mouseovered)
+          .on("mouseout", mouseouted)
+          .on("dblclick",mouseouted);
+
+          debugger;
+          nodes.forEach(function(d){termArray.push(d.name)});
+          termArray = termArray.sort();
+
+          $(function () {
+              $("#search").autocomplete({
+                  source: termArray
+              });
+          });
+
+           $('#autocomplete').autocomplete({
+    lookup: termArray,
+    onSelect: function (suggestion) {
+    // some function here
+    }
+  });
+ 
+
+
+    });
+  
+
+function mouseovered(d) {
+  node
+      .each(function(n) { n.target = n.source = false; });
+
+  link
+      .classed("link--target", function(l) { if (l.target === d) return l.source.source = true; })
+      .classed("link--source", function(l) { if (l.source === d) return l.target.target = true; })
+    .filter(function(l) { return l.target === d || l.source === d; })
+      .each(function() { this.parentNode.appendChild(this); });
+
+  node
+      .classed("node--target", function(n) { return n.target; })
+      .classed("node--source", function(n) { return n.source; });
+}
+
+function mouseouted(d) {
+  link
+      .classed("link--target", false)
+      .classed("link--source", false);
+
+  node
+      .classed("node--target", false)
+      .classed("node--source", false);
+}
+
+d3.select(self.frameElement).style("height", diameter + "px");
+
+// Lazily construct the package hierarchy from class names.
+function packageHierarchy(classes) {
+  var map = {};
+
+  function find(name, data) {
+    var node = map[name], i;
+    if (!node) {
+      node = map[name] = data || {name: name, children: []};
+      if (name.length) {
+        node.parent = find(name.substring(0, i = name.lastIndexOf("|")));
+        node.parent.children.push(node);
+        node.key = name.substring(i + 1);
+      }
+    }
+    return node;
+  }
+
+  classes.forEach(function(d) {
+    find(d.name, d);
+  });
+
+  return map[""];
+}
+
+// Return a list of imports for the given array of nodes.
+function packageImports(nodes) {
+  var map = {},
+      imports = [];
+
+  // Compute a map from name to node.
+  nodes.forEach(function(d) {
+    map[d.name] = d;
+  });
+
+  // For each import, construct a link from the source to target node.
+  nodes.forEach(function(d) {
+    if (d.imports) d.imports.forEach(function(i) {
+      imports.push({source: map[d.name], target: map[i]});
+    });
+  });
+
+  return imports;
+}
+
+function searchNode() {
+  debugger;
+  var selectedVal = document.getElementById('autocomplete').value;
+  d3.selectAll('.node')
+  .style("font-weight", function(d){if(d.name == selectedVal) return 700;})
+  .style("fill", function(d){if(d.name == selectedVal) return "black";})
+
+  
+  nodes.forEach(function(d){
+    if(selectedVal==d.name){
+      mouseovered(d);
+    }
+
+  });
+ 
+}
+
+function resetNode() {
+  debugger;
+  document.getElementById('autocomplete').value = '';
+  var selectedVal = document.getElementById('autocomplete').value;
+  
+  d3.selectAll('.node')
+  .style("font-weight", function(d){if(d.name == selectedVal) return 700;})
+  .style("fill", function(d){if(d.name == selectedVal) return "black";}) 
+
+  nodes.forEach(function(d){
+    if(selectedVal==d.name){
+      mouseovered(d);
+    }
+
+  });
+
+
+  document.getElementById('autocomplete').value = '';
+ 
+}
+
+</script>
