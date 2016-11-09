@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<style>
+body{
+  font: 300 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+svg{
+    display: block;
+    margin: auto;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #003366;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    padding: 16px;
+    margin: auto;
+    text-decoration: none;
+}
+
+.main {
+    padding: 16px;
+    margin-top: 30px;
+    height: 1500px; /* Used in this example to enable scrolling */
+}
+
+</style>
+<body>
+<ul class="tab">
+  <li><a href="/home.html">Home</a></li>
+  <li><a href="/wordle/wordle.html">Wordle</a></li>
+  <li><a href="/timefrequency.html">Time Frequency</a></li>
+  <li><a href="/hbundle.html">Relationship - huffington</a></li>
+  <li><a href="/wbundle.html">Relationship - wikinews</a></li>
+  <li><a href="/wMap.html">Location map - wikinews</a></li>
+  <li><a href="/hMap.html">Location map - huffington</a></li>
+</ul>
+ <body>
+ <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="datamaps.world.min.js"></script>
+<div style="height: 50px; "></div>
+<div><p align="center">In Wikinews, see the most frequent countries, the below show the range</p></div>
+<div class="auto">
+
+   <svg align="center" width="600" height="50">
+    <g transform="translate(140,20)">
+        <circle r="10" stroke="black" fill="#d9bdfe"></circle>
+        <text dx="15" dy="5">163-218</text>
+    </g>
+     <g transform="translate(220,20)">
+        <circle r="10" stroke="black" fill="#68cdf6"></circle>
+        <text dx="15" dy="5">219-335</text>
+    </g>
+    <g transform="translate(300,20)">
+        <circle r="10" stroke="black" fill="#f8c60e"></circle>
+        <text dx="15" dy="5">383-474</text>
+    </g>
+    <g transform="translate(380,20)">
+        <circle r="10" stroke="black" fill="#2ca02c"></circle>
+        <text dx="15" dy="5">481-1035</text>
+    </g>
+      <p id="#display" align="center"></p>
+   </svg>
+   </div>
+<div class="auto">
+<div id="container" style="position: relative; width: 700px; height: 400px; margin: 0 auto"></div>
+<script>
+
+var frequency = function(words) {
+  return words.filter(Boolean).reduce(function(acc, x) {
+    for(var i = 0 ; i < x.length; i++){
+      if(x[i] != "" || x[i].includes(' ')){
+        x[i] = x[i].replace(/'/gi, "");
+          acc[x[i]] = ++acc[x[i]] || 1;}}
+      return acc;
+  },{})
+}
+
+
+function sortObject(obj) {
+    var arr = [];
+    var prop;
+    for (prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            arr.push({
+                'key': prop,
+                'value': obj[prop]
+            });
+        }
+    }
+    arr.sort(function(a, b) {
+        return a.value - b.value;
+    });
+    return arr; // returns array
+}
+
+function highFrequency(words,times){
+  var wordfreq = {};
+  var higwords;
+  var max = 0 ; 
+  words = sortObject(words);
+
+   for(var i = words.length - times ; i <  words.length; i++){
+        wordfreq[words[i].key] = words[i].value;
+   }
+  return wordfreq;
+} 
+
+
+d3.tsv("wikinews.tsv", function(error, weblog) {
+
+ 
+  blogs =  d3.keys(weblog[0]).slice(0).map(function(id) {
+    return {
+      id: id,
+      values: weblog.map(function(d) {
+        return {time: new Date(id["time"]), person: d.person, location:d.location, organization:d.organization, miscellaneous:d.miscellaneous};
+      })
+    };
+  });
+
+blogs = blogs[0];
+
+   blogs.values.forEach(function(c,d){
+        if(c.time>d.time) return 1;
+        else if(c.time<d.time) return -1;
+        else return 0;
+  });
+
+var topOrganization = [];
+var topPerson = [];
+var topLocation = [];
+var topMiscellaneous = [];
+
+  for(var i = 0 ; i < blogs.values.length; i++){
+    blogs.values[i].person = blogs.values[i].person.split('|');
+    blogs.values[i].location = blogs.values[i].location.split('|');
+    blogs.values[i].miscellaneous = blogs.values[i].miscellaneous.split('|');
+    blogs.values[i].organization = blogs.values[i].organization.split('|');
+    topOrganization.push(blogs.values[i].organization);
+    topLocation.push(blogs.values[i].location);
+    topMiscellaneous.push(blogs.values[i].miscellaneous);
+    topPerson.push(blogs.values[i].person);
+  }
+ 
+
+  //Frequency of each element
+  topOrganization = frequency(topOrganization);
+  topPerson = frequency(topPerson);
+  topLocation = frequency(topLocation);
+  topMiscellaneous = frequency(topMiscellaneous);
+
+  
+   //top 50 frequency of each categories
+  top50Location = highFrequency(topLocation,50);
+  top50Person = highFrequency(topPerson,50);
+  top50Miscellaneous = highFrequency(topMiscellaneous,50);
+  top50Organization =  highFrequency(topOrganization,50);
+
+
+  var listcnt = [];
+  var countries = Datamap.prototype.worldTopo.objects.world.geometries;
+  for (var i = 0, j = countries.length; i < j; i++){ 
+    for(var loc in top50Location){
+        if(loc.toLowerCase() == countries[i].properties.name.toLowerCase()){
+          listcnt.push(countries[i].id);
+        }
+    }
+  }
+
+var freData = {cnt:[]};    
+d3.csv("long.csv", function(error, long) {
+    console.log(long);
+
+for(var j=0; j<long.length;j++)
+for(l in top50Location){
+    if(long[j].name.toLowerCase() == l.toLowerCase()){
+for (var i = 0; i< countries.length; i++)
+ if(l.toLowerCase() == countries[i].properties.name.toLowerCase()){
+    if(top50Location[l]>= 163 && top50Location[l]<=218){
+       freData.cnt.push({
+        name: l,
+        freq: top50Location[l],
+        fillKey: 'first',
+         radius: Math.sqrt(top50Location[l])/3,
+          latitude: long[j].latitude,
+            longitude: long[j].longitude
+    
+        })}
+       else if(top50Location[l]>=219 && top50Location[l]<=335){
+ freData.cnt.push({
+        name: l,
+        freq: top50Location[l],
+        fillKey: 'second',
+         radius: Math.sqrt(top50Location[l])/3,
+          latitude: long[j].latitude,
+            longitude: long[j].longitude
+    
+        })
+       }
+       else if(top50Location[l]>=384 && top50Location[l]<= 474){
+ freData.cnt.push({
+        name: l,
+        freq: top50Location[l],
+        fillKey: 'third',
+         radius: Math.sqrt(top50Location[l])/3,
+          latitude: long[j].latitude,
+            longitude: long[j].longitude
+    
+        })
+       }
+       else if(top50Location[l]>=481 || top50Location[l]<= 1035){
+         freData.cnt.push({
+        name: l,
+        freq: top50Location[l],
+        fillKey: 'forth',
+         radius: Math.sqrt(top50Location[l])/3,
+          latitude: long[j].latitude,
+            longitude: long[j].longitude
+    
+        })
+       }
+}
+}
+}
+
+
+  var freqMap = new Datamap({
+    element: document.getElementById('container'),
+    scope: 'world',
+    data_width: '10',
+    geographyConfig: {
+        popupOnHover: true,
+        highlightOnHover: true
+    },
+    fills: {
+        'first': '#d9bdfe',
+        'second': '#68cdf6',
+        'third': '#f8c60e',
+        'forth': '#2ca02c',
+        defaultFill: '#aab9b9'
+    }
+});
+
+// freqMap.updateChoropleth({'AFG': 'green'});
+for(var i = 0 ;i < listcnt.length; i++){
+  var temp = listcnt[i];
+  freqMap.updateChoropleth({temp: 'green'});
+}
+
+     freData.cnt.push({
+        name: 'United States',
+        radius: Math.sqrt(2207)/3,
+        freq: 2207,
+        fillKey: 'forth',
+        latitude: 37.0902,
+        longitude: -95.7129
+      });
+
+     var frequencyData = freData.cnt;
+ debugger;
+
+//draw bubbles for frequencyData
+freqMap.bubbles(frequencyData, {
+    popupTemplate: function (geo, data) {
+            return ['<div class="hoverinfo">' +  data.name,
+            '<br/>Frequency: ' +  data.freq + ' times',
+            '</div>'].join('');
+    }
+});
+});
+  //  var map = new Datamap({element: document.getElementById('container')});
+
+//     var freqMap = new Datamap({
+//     element: document.getElementById('container'),
+//     scope: 'world',
+//     data_width: '10',
+//     geographyConfig: {
+//         popupOnHover: true,
+//         highlightOnHover: true
+//     },
+//     fills: {
+//         'IRN': '#2ca02c',
+//         'MEX': '#68cdf6',
+//         'CAN': '#d9bdfe',
+//         'USA': '#f8c60e',
+//         defaultFill: '#aab9b9'
+//     },
+//     data: {
+//         'AFG': {fillKey: 'IRN'},
+//         'AUS': {fillKey: 'IRN'},
+//         'BRA': {fillKey: 'MEX'},
+//         'CHN': {fillKey: 'IRN'},
+//         'CAN': {fillKey: 'IRN'},
+//         'DEU': {fillKey: 'DEU'},
+//         'EGY': {fillKey: 'CAN'},
+//         'FRA': {fillKey: 'IRN'},
+//         'GBR': {fillKey: 'IRN'},
+//         'IDN': {fillKey: 'CAN'},
+//         'IRL': {fillKey: 'CAN'},
+//         'IRQ': {fillKey: 'IRN'},
+//         'ISR': {fillKey: 'USA'},
+//         'ITA': {fillKey: 'USA'},
+//         'JPN': {fillKey: 'USA'},
+//         'MEX': {fillKey: 'MEX'},
+//         'NLD': {fillKey: 'CAN'},
+//         'NZL': {fillKey: 'USA'},
+//         'PAK': {fillKey: 'MEX'},
+//         'POL': {fillKey: 'CAN'},
+//         'TUR': {fillKey: 'MEX'},
+//         'TWN': {fillKey: 'CAN'},
+//         'THA': {fillKey: 'CAN'},
+//         'ZAF': {fillKey: 'MEX'},
+//         'USA': {fillKey: 'IRN'},
+//         'IRN': {fillKey: 'IRN'},
+//         'RUS': {fillKey: 'IRN'},
+//         'IND': {fillKey: 'USA'},
+//         'ESP': {fillKey: 'MEX'},
+//         'CAF': {fillKey: 'MEX'}
+//     }
+// });
+
+// freqMap.updateChoropleth({'AFG': 'green'});
+// for(var i = 0 ;i < listcnt.length; i++){
+//   var temp = listcnt[i];
+//   freqMap.updateChoropleth({temp: 'green'});
+// }
+
+//      var frequencyData = freData.cnt;
+
+//  debugger;
+
+// //draw bubbles for frequencyData
+// freqMap.bubbles(frequencyData, {
+//     popupTemplate: function (geo, data) {
+//             return ['<div class="hoverinfo">' +  data.name,
+//             '<br/>Frequency: ' +  data.yield + ' times',
+//             '</div>'].join('');
+//     }
+// });
+
+});
+</script>
+   </body>    
+ </html>
