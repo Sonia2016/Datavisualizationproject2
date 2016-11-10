@@ -50,35 +50,18 @@ li a {
   <li><a href="https://sonia2016.github.io/Datavisualizationproject2/wMap.html">Location map - wikinews</a></li>
   <li><a href="https://sonia2016.github.io/Datavisualizationproject2/hMap.html">Location map - huffington</a></li>
 </ul>
- <body>
+ <body onload="legendDemo()">
  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="datamaps.world.min.js"></script>
+<script src="http://d3js.org/colorbrewer.v1.min.js"></script>
 <div style="height: 50px; "></div>
 <div><p align="center">In Wikinews, see the most frequent countries, the below show the range</p></div>
-<div class="auto">
+<div id="vizcontainer">
+<svg></svg>
+</div>
+<script src="legend.js"></script>
 
-   <svg align="center" width="600" height="50">
-    <g transform="translate(140,20)">
-        <circle r="10" stroke="black" fill="#d9bdfe"></circle>
-        <text dx="15" dy="5">163-218</text>
-    </g>
-     <g transform="translate(220,20)">
-        <circle r="10" stroke="black" fill="#68cdf6"></circle>
-        <text dx="15" dy="5">219-335</text>
-    </g>
-    <g transform="translate(300,20)">
-        <circle r="10" stroke="black" fill="#f8c60e"></circle>
-        <text dx="15" dy="5">383-474</text>
-    </g>
-    <g transform="translate(380,20)">
-        <circle r="10" stroke="black" fill="#2ca02c"></circle>
-        <text dx="15" dy="5">481-1035</text>
-    </g>
-      <p id="#display" align="center"></p>
-   </svg>
-   </div>
-<div class="auto">
 <div id="container" style="position: relative; width: 700px; height: 400px; margin: 0 auto"></div>
 <script>
 
@@ -123,6 +106,7 @@ function highFrequency(words,times){
 } 
 
 
+
 d3.tsv("https://sonia2016.github.io/Datavisualizationproject2/Data/wikinews.tsv", function(error, weblog) {
 
  
@@ -161,17 +145,13 @@ var topMiscellaneous = [];
  
 
   //Frequency of each element
-  topOrganization = frequency(topOrganization);
-  topPerson = frequency(topPerson);
   topLocation = frequency(topLocation);
-  topMiscellaneous = frequency(topMiscellaneous);
+
 
   
    //top 50 frequency of each categories
   top50Location = highFrequency(topLocation,50);
-  top50Person = highFrequency(topPerson,50);
-  top50Miscellaneous = highFrequency(topMiscellaneous,50);
-  top50Organization =  highFrequency(topOrganization,50);
+
 
 
   var listcnt = [];
@@ -249,11 +229,12 @@ for (var i = 0; i< countries.length; i++)
         popupOnHover: true,
         highlightOnHover: true
     },
+
     fills: {
-        'first': '#d9bdfe',
-        'second': '#68cdf6',
-        'third': '#f8c60e',
-        'forth': '#2ca02c',
+        'first': '#fee5d9',
+        'second': '#fcae91',
+        'third': '#fb6a4a',
+        'forth': '#cb181d',
         defaultFill: '#aab9b9'
     }
 });
@@ -272,6 +253,15 @@ for(var i = 0 ;i < listcnt.length; i++){
         latitude: 37.0902,
         longitude: -95.7129
       });
+
+   freData.cnt.push({
+        name: 'Iran',
+        radius: Math.sqrt(451)/3,
+        freq: 451,
+        fillKey: 'forth',
+        latitude: 32.4279,
+        longitude: 53.6880
+      });
   
    freData.cnt.push({
         name: 'Russia',
@@ -283,7 +273,7 @@ for(var i = 0 ;i < listcnt.length; i++){
       });
 
      var frequencyData = freData.cnt;
- debugger;
+ 
 
 //draw bubbles for frequencyData
 freqMap.bubbles(frequencyData, {
@@ -297,6 +287,23 @@ freqMap.bubbles(frequencyData, {
 
 
 });
+</script>
+
+<script>
+  function legendDemo() {
+
+  sampleNumerical = [218,335,474,1035];
+  debugger;
+    sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(colorbrewer.Reds[4]);
+  horizontalLegend = d3.svg.legend().units("Freq").cellWidth(45).cellHeight(10).inputScale(sampleThreshold).cellStepping(100);
+
+  d3.select("svg").append("g").attr("transform", "translate(50,70)").attr("class", "legend").call(horizontalLegend);
+
+  sampleCategoricalData = ["Something","Something Else", "Another", "This", "That", "Etc"]
+  sampleOrdinal = d3.scale.category20().domain(sampleCategoricalData);
+
+
+  }
 </script>
    </body>    
  </html>
