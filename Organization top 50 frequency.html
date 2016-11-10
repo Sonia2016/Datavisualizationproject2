@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <title></title>
-  <style>
+        <style>
+  .graphid path {
+            fill: none;
+        }  
   svg {
             font-family: "Helvetica Neue", Helvetica;
         }
@@ -66,16 +69,16 @@
 
 <table>
 	<tr bgcolor="#e82f23">
-		<th colspan="2"><h1>Text and Geospatial visualization<h1></th>
+		<th colspan="3"><h1>Text and Geospatial visualization<h1></th>
 		
 	</tr>
 	  <tr>
 		<td>
-		<button class="button" onclick=set_color("#b8860b",1)>    Person   </button><br>
-		<button class="button button2" onclick=set_color("#008CBA",3)>   Location  </button><br>
-		<button class="button button3" onclick=set_color("#f44336",0)>Organization </button><br>
-		<button class="button button4" onclick=set_color("green",2)>Miscellaneous</button><br>
-		<button class="button button5" onclick=set_color("",4)>	 ALL     </button>
+		<button class="button" onclick=showNewWords(myWordCloud,1)>    Person   </button><br>
+		<button class="button button2" onclick=showNewWords(myWordCloud,3)>   Location  </button><br>
+		<button class="button button3" onclick=showNewWords(myWordCloud,0)>Organization </button><br>
+		<button class="button button4" onclick=showNewWords(myWordCloud,2)>Miscellaneous</button><br>
+		<button class="button button5" onclick=showNewWords(myWordCloud,4)>	 ALL     </button>
 		</td>
 		<td>
 			<br>
@@ -86,6 +89,9 @@
 			</p>
 			 
 			<div id="slider-range"></div>
+		</td>
+	  <td>
+			<div id="chart1" >	</div>
 		</td>
 	  </tr>
 	</table>
@@ -100,7 +106,7 @@
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
  <script src="http://d3js.org/d3.v3.min.js"></script>
  <script src="/d3-tooltip.js"></script>
- <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+ <script src="/d3.layout.cloud.js"></script>
 <script>
 	/*jshint asi:true laxcomma:true expr:true boss:true eqnull:true*/
 var doc = document
@@ -116,8 +122,8 @@ var elem = function(tag, props) {
  * @param words {Array}
  * @returns {Object} Frequency of words per length
  */
-var frequency = function(words) {
-  return words.filter(Boolean).reduce(function(acc, x) {
+var frequency = function(data) {
+  return data.filter(Boolean).reduce(function(acc, x) {
     for(var i = 0 ; i < x.length; i++){
       if(x[i] != "" || x[i].includes(' ')){
         x[i] = x[i].replace(/'/gi, "");
@@ -176,14 +182,14 @@ var resultOf = function(freq) {
 }
 
 
-function highFrequency(words,times){
+function highFrequency(data,times){
   var wordfreq = {};
   var higwords;
   var max = 0 ; 
-  words = sortObject(words);
+  data = sortObject(data);
 
-   for(var i = words.length - times ; i <  words.length; i++){
-        wordfreq[words[i].key] = words[i].value;
+   for(var i = data.length - times ; i <  data.length; i++){
+        wordfreq[data[i].key] = data[i].value;
    }
   return wordfreq;
 } 
@@ -196,6 +202,10 @@ var top50Org =[""];
 var top50Per =[""];
 var top50Loc =[""];
 var top50Mis =[""];
+var lt = {};
+var ot = {};
+var mt = {};
+var pt = {};
 //var timeformat = d3.time.format("%m-%d-%Y");
 d3.tsv("wikinews.tsv", function(error, data) {
 
@@ -216,6 +226,7 @@ d3.tsv("wikinews.tsv", function(error, data) {
     };
   });
 
+  blogs = blogs[0];
   // console.log(blogs);
   
 var topOrganization = [];
@@ -224,26 +235,23 @@ var topLocation = [];
 var topMiscellaneous = [];
 
 
-  blogs.forEach(function(a){
-      a.values.sort(function(c,d){
+  blogs.values.forEach(function(c,d){
         if(c.time>d.time) return 1;
         else if(c.time<d.time) return -1;
         else return 0;
       });
-    
-  });
 
   
   b = 0;
-  for(var i = 0 ; i < blogs[b].values.length; i++){
-	blogs[b].values[i].person = blogs[b].values[i].person.split('|');
-    blogs[b].values[i].location = blogs[b].values[i].location.split('|');
-    blogs[b].values[i].miscellaneous = blogs[b].values[i].miscellaneous.split('|');
-    blogs[b].values[i].organization = blogs[b].values[i].organization.split('|');
-    topOrganization.push(blogs[b].values[i].organization);
-    topLocation.push(blogs[b].values[i].location);
-    topMiscellaneous.push(blogs[b].values[i].miscellaneous);
-    topPerson.push(blogs[b].values[i].person);
+  for(var i = 0 ; i < blogs.values.length; i++){
+	blogs.values[i].person = blogs.values[i].person.split('|');
+    blogs.values[i].location = blogs.values[i].location.split('|');
+    blogs.values[i].miscellaneous = blogs.values[i].miscellaneous.split('|');
+    blogs.values[i].organization = blogs.values[i].organization.split('|');
+    topOrganization.push(blogs.values[i].organization);
+    topLocation.push(blogs.values[i].location);
+    topMiscellaneous.push(blogs.values[i].miscellaneous);
+    topPerson.push(blogs.values[i].person);
   }
  
 
@@ -255,82 +263,85 @@ var topMiscellaneous = [];
 
   
    //top 50 frequency of each categories
-  top50Location = highFrequency(topLocation,100);
-  top50Person = highFrequency(topPerson,100);
+  top50Location = highFrequency(topLocation,50);
+  top50Person = highFrequency(topPerson,50);
   top50Miscellaneous = highFrequency(topMiscellaneous,50);
-  top50Organization =  highFrequency(topOrganization,100);
+  top50Organization =  highFrequency(topOrganization,50);
  
 
 
-lt = {};
+//lt = {};
 
-for(var i = 0 ; i < blogs[0].values.length;i++){
+for(var i = 0 ; i < blogs.values.length;i++){
   var temp = []
   for(var l in top50Location){
-    if(blogs[0].values[i].location.includes(l))
+	if(blogs.values[i].location.includes(l))
     {
-      if(lt[blogs[0].values[i].time]== undefined)
-        {temp.push(l);
-          lt[blogs[0].values[i].time] = temp;
-          lt[blogs[0].values[i].time][l] = 1;
+      if(lt[blogs.values[i].time]== undefined)
+        {
+		temp.push(l);
+          lt[blogs.values[i].time] = temp;
+          lt[blogs.values[i].time][l] = 1;
         }
       else
-        { if(lt[blogs[0].values[i].time].includes(l))
-             lt[blogs[0].values[i].time][l] =  lt[blogs[0].values[i].time][l] + 1;
+        { if(lt[blogs.values[i].time].includes(l))
+             lt[blogs.values[i].time][l] =  lt[blogs.values[i].time][l] + 1;
              else
               {
-                lt[blogs[0].values[i].time].push(l);
-                lt[blogs[0].values[i].time][l] = 1;
+                lt[blogs.values[i].time].push(l);
+                lt[blogs.values[i].time][l] = 1;
               }
             }
           }
         }
-    }
+	//debugger;
+}
 
-	pt = {};
-	for(var i = 0 ; i < blogs[0].values.length;i++){
+//debugger;
+	//pt = {};
+	for(var i = 0 ; i < blogs.values.length;i++){
 	  var temp = []
 	  
 	  for(var l in top50Person){
-		if(blogs[0].values[i].person.includes(l))
+		if(blogs.values[i].person.includes(l))
 		{
-		  if(pt[blogs[0].values[i].time]== undefined)
+		  if(pt[blogs.values[i].time]== undefined)
 			{temp.push(l);
-			  pt[blogs[0].values[i].time] = temp;
-			  pt[blogs[0].values[i].time][l] = 1;
+			  pt[blogs.values[i].time] = temp;
+			  pt[blogs.values[i].time][l] = 1;
 			}
 		  else
-			{ if(pt[blogs[0].values[i].time].includes(l))
-				 pt[blogs[0].values[i].time][l] =  pt[blogs[0].values[i].time][l] + 1;
+			{ if(pt[blogs.values[i].time].includes(l))
+				 pt[blogs.values[i].time][l] =  pt[blogs.values[i].time][l] + 1;
 				 else
 				  {
-					pt[blogs[0].values[i].time].push(l);
-					pt[blogs[0].values[i].time][l] = 1;
+					pt[blogs.values[i].time].push(l);
+					pt[blogs.values[i].time][l] = 1;
 				  }
 				}
 			  }
 			}
 	}
   
-	var ot={}
-  for(var i = 0 ; i < blogs[0].values.length;i++){
+	//var ot={}
+  for(var i = 0 ; i < blogs.values.length;i++){
 	  
 	  var temp = []
 	  for(var l in top50Organization){
-		if(blogs[0].values[i].organization.includes(l))
+		if(blogs.values[i].organization.includes(l))
 		{
-		  if(ot[blogs[0].values[i].time]== undefined)
+		  if(ot[blogs.values[i].time]== undefined)
 			{temp.push(l);
-			  ot[blogs[0].values[i].time] = temp;
-			  ot[blogs[0].values[i].time][l] = 1;
+			  ot[blogs.values[i].time] = temp;
+			  ot[blogs.values[i].time][l] = 1;
 			}
 		  else
-			{ if(ot[blogs[0].values[i].time].includes(l))
-				 ot[blogs[0].values[i].time][l] =  ot[blogs[0].values[i].time][l] + 1;
+			{ if(ot[blogs.values[i].time].includes(l))
+				 ot[blogs.values[i].time][l] =  ot[blogs.values[i].time][l] + 1;
 				 else
 				  {
-					ot[blogs[0].values[i].time].push(l);
-					ot[blogs[0].values[i].time][l] = 1;
+					ot[blogs.values[i].time].push(l);
+					ot[blogs.values[i].time][l] = 1;
 				  }
 				}
 			  }
@@ -338,194 +349,31 @@ for(var i = 0 ; i < blogs[0].values.length;i++){
 			//debugger;
     }
 
-	var mt={}
-	for(var i = 0 ; i < blogs[0].values.length;i++){
+	//var mt={}
+	for(var i = 0 ; i < blogs.values.length;i++){
 		var temp = []
 
 		for(var l in top50Miscellaneous){
-		if(blogs[0].values[i].miscellaneous.includes(l))
+		if(blogs.values[i].miscellaneous.includes(l))
 		{
-		  if(mt[blogs[0].values[i].time]== undefined)
+		  if(mt[blogs.values[i].time]== undefined)
 			{temp.push(l);
-			  mt[blogs[0].values[i].time] = temp;
-			  mt[blogs[0].values[i].time][l] = 1;
+			  mt[blogs.values[i].time] = temp;
+			  mt[blogs.values[i].time][l] = 1;
 			}
 		  else
-			{ if(mt[blogs[0].values[i].time].includes(l))
-				 mt[blogs[0].values[i].time][l] =  mt[blogs[0].values[i].time][l] + 1;
+			{ if(mt[blogs.values[i].time].includes(l))
+				 mt[blogs.values[i].time][l] =  mt[blogs.values[i].time][l] + 1;
 				 else
 				  {
-					mt[blogs[0].values[i].time].push(l);
-					mt[blogs[0].values[i].time][l] = 1;
+					mt[blogs.values[i].time].push(l);
+					mt[blogs.values[i].time][l] = 1;
 				  }
 				}
 			  }
 			}
 	}
-	/*
-	var person={};
-	var organization={};
-	var location={};
-	var miscellaneous={};*/
-	//debugger;
-	// For loop to put hashmap data into the array
-	//console.log(pt);
-	for(var key in pt)
-	{
-		for(var i in pt[key])
-		{
-			var temp = pt[key][pt[key][i]];
-			if( !isNaN(temp))
-			{
-				/*debugger;
-				console.log("in");
-				top50Per[0]=top50Per[0]+""+key+" "+pt[key][i]+"*"+temp;
-				//date=new Date(key);
-				if(person[key]== undefined)
-					person[key]=[];
-				person[key].push(pt[key][i]+"*"+temp+"|");*/
-				words[1]=words[1]+""+key+"*"+pt[key][i]+"*"+pt[key][pt[key][i]]+"|";
-			}	
-		}
-	}
 
-	/*for(var i in person)
-	{
-		//debugger;
-		for(var key in person[key])
-			words[1]=words[1]+""+i+"*"+person[i][key];
-		console.log(i+"*"+person[i]);
-	}*/
-	//console.log(words[1]);
-	for(var key in lt)
-	{
-		for(var i in lt[key])
-		{
-			var temp = lt[key][lt[key][i]];
-			if( !isNaN(temp))
-			{
-				/*top50Loc[0]=top50Loc[0]+""+key+" "+lt[key][i]+"*"+temp;
-				//date=new Date(key);
-				if(location[key]== undefined)
-							location[key]=[];
-				location[key].push(lt[key][i]+"*"+temp+"|");*/
-				words[3]=words[3]+""+key+"*"+lt[key][i]+"*"+lt[key][lt[key][i]]+"|";
-			}	
-		}
-	}
-	/*for(var i in location)
-	{
-		words[3]=words[3]+""+i+"*"+location[i];
-	}*/
-	for(var key in mt)
-	{
-		for(var i in mt[key])
-		{
-			var temp = mt[key][mt[key][i]];
-			if( !isNaN(temp))
-			{
-				/*top50Mis[0]=top50Mis[0]+""+key+" "+mt[key][i]+"*"+temp;
-				//date=new Date(key);
-				if(miscellaneous[key]== undefined)
-							miscellaneous[key]=[];
-				miscellaneous[key].push(mt[key][i]+"*"+temp+"|");*/
-				words[2]=words[2]+""+key+"*"+mt[key][i]+"*"+mt[key][mt[key][i]]+"|";
-			}	
-		}
-	}
-	/*for(var i in miscellaneous)
-	{
-		words[2]=words[2]+""+i+"*"+miscellaneous[i];
-	}*/
-	for(var key in ot)
-	{
-		for(var i in ot[key])
-		{
-			var temp = ot[key][ot[key][i]];
-			if( !isNaN(temp))
-			{
-				/*top50Org[0]=top50Org[0]+""+key+" "+ot[key][i]+"*"+temp;
-				//date=new Date(key);
-				if(organization[key]== undefined)
-							organization[key]=[];
-				organization[key].push(ot[key][i]+"*"+temp+"|");*/
-				words[0]=words[0]+""+key+"*"+ot[key][0]+"*"+ot[key][ot[key][0]]+"|";
-			}	
-		}
-			//console.log(key+" "+organization[key]);
-	}
-	/*
-	for(var i in organization)
-	{
-		words[0]=words[0]+""+i+"*"+organization[i];
-	}*/
-	//console.log(words[0]);
-	//console.log(words[1]);
-	//console.log(words[2]);
-	//console.log(words[3]);
-	/*
-	for(var key in ot)
-	{
-		for (var i in ot[key])
-		{
-			var temp = ot[key][ot[key][i]];
-			//debugger;
-			if( !isNaN(temp))
-			{
-				//console.log(""+key+" "+ot[key][i]+" "+temp)
-				top50Org[0]=top50Org[0]+""+key+" "+ot[key][i]+"*"+temp+"|";
-				
-				
-			}	
-			
-		}
-	}
-	for(var key in pt)
-	{
-		for (var i in pt[key])
-		{
-			var temp = pt[key][pt[key][i]];
-			//debugger;
-			if( !isNaN(temp))
-			{
-				//console.log(""+key+" "+pt[key][i]+" "+temp)
-				top50Per[0]=top50Per[0]+""+key+" "+pt[key][i]+"*"+temp+"|";
-			}	
-			
-		}
-	}
-	for(var key in mt)
-	{
-		for (var i in mt[key])
-		{
-			var temp = mt[key][mt[key][i]];
-			//debugger;
-			if( !isNaN(temp))
-			{
-				//console.log(""+key+" "+mt[key][i]+" "+temp)
-				top50Mis[0]=top50Mis[0]+""+key+" "+mt[key][i]+"*"+temp+"|";
-			}	
-			
-		}
-	}*/
-	/*for (var key in pt)
-	{
-		top50Per[0]=top50Per[0]+""+key+"*"+pt[key]+"|";
-	}
-	for (var key in top50Miscellaneous)
-	{
-		top50Mis[0]=top50Mis[0]+""+key+"*"+top50Miscellaneous[key]+"|";
-	}
-	for (var key in top50Organization)
-	{
-		top50Org[0]=top50Org[0]+""+key+"*"+top50Organization[key]+"|";
-	}
-	*/
-	//save_content_to_file("asdasdasd", "D:\TTU\Visuals\Project_2\testaa");
-	//console.log("Org "+top50Org[0]);
-	//console.log("Per "+top50Per[0]);
-	//console.log("Loc "+top50Loc[0]);
-	//console.log("Mis "+top50Mis[0]);
 	showNewWords(myWordCloud);
 });
 
@@ -577,24 +425,30 @@ function wordCloud(selector) {
 						.style("fill", "none")
 						.style("stroke-width", 1)
 						//.style("fill", function(d, i) { return fill(i); })// color
-						.style("fill",color)// color
+						.style("fill",function (d) {
+							return (d.text.split('*')[1]);
+						})// color
 						.attr("text-anchor", "middle")
 						.attr("opacity",function (d) {
 							//console.log(.2+(d.size/100));
 							//return (.3+(d.size%10)/10);
 							return (.2+(d.size/10));
 						})
-						.text(function(d) { return d.text; })
+						.text(function(d) { return d.text.split('*')[0]; })
 						.attr("transform", function(d) {
 							return "translate(" + [d.x+300, d.y+250] + ")rotate(" + d.rotate + ")";
 							})
 						.on("mouseover", function (d) {
-									lineTip.html(d.text+" "+((d.size-7)*(d.size-7)));
+									//lineTip.html(d.text.split('*')[0]+" "+((d.size-7)*(d.size-7)));
+									lineTip.html(d.text.split('*')[0]+" "+d.size);
 									lineTip.show();
 							})
 						.on("mouseout", function (d) {
 								  lineTip.hide()
 							  })
+						.on("click",function (d){
+							plot(d.text.split('*')[0]);
+						})
 
         //Entering and existing words
         cloud
@@ -627,6 +481,7 @@ function wordCloud(selector) {
         // of the wordCloud return value.
         update: function(words) {
 		//debugger;
+		//debugger;
             d3.layout.cloud().size([width, height])
                 .words(words)
                 .padding(2)
@@ -644,38 +499,24 @@ function wordCloud(selector) {
 //Prepare one of the sample sentences by removing punctuation,
 // creating an array of words and computing a random size attribute.
 function getWords(i) {
-	//debugger;
-	return words[i]
-            .replace(/[!\.,:;\?"']/g, '')
+		return words[i]
+            .replace(/[!\.,:;\?]/g, '')
             .split('|')
             .map(function(d) {
-				//var s=d.substring(d.indexOf("*")+1);
-				//console.log(d+"  "+d.substring(0,d.indexOf("*")));
-				//return {text: d, size: 10 + Math.random() * 60};
-				//return {text: d.substring(0,d.indexOf("*")), size: (((d.substring(d.indexOf("*")+1))/100)+15)};
-				//debugger;
-				if(d!='')
-				{
-					var a=d.split('*')
-					//console.log(d);
-					var aa=a[0];
-					if( aa > min_date && aa < max_date)
-					{
-						return {text: d.split('*')[1], size: ((a[2])*2)+10};
-					}
-					else
-						return {text: "a", size: 0};
-				}
-				else
-					return {text: "a", size: 0};
+				var a=d.split('*')
+                //return {text: a[1]+"*"+a[3], size: ((a[2])*2)+10};
+                return {text: a[1]+"*"+a[3], size: (d.split('*')[2]*2)+10};
             })
 }
 
 //This method tells the word cloud to redraw with a new set of words.
 //In reality the new words would probably come from a server request,
 // user input or some other source.
+var selection;
 function showNewWords(vis, i) {
     i = i || 0;
+	selection=i;
+	
     //words[0]=top50Org[0];
 	//words[1]=top50Per[0]
 	//words[2]=top50Mis[0]
@@ -685,7 +526,87 @@ function showNewWords(vis, i) {
 	//console.log("*******************************************************"+words[i]);
 	//console.log("*******************************************************");
     //vis.update(getWords(i))
-    vis.update(getWords(i))
+	//myWordCloud = wordCloud('body');
+	
+	if(selection==0)
+	{
+		words[0]="";
+		for(var l in ot){
+			 //debugger;
+			if(l >= min_date && l < max_date)
+			{
+				for(var i in ot[l]){
+					if( !isNaN(ot[l][ot[l][i]]))
+					{
+						//debugger;
+						words[0]=words[0]+""+l+"*"+ot[l][i]+"*"+ot[l][ot[l][i]]+"*"+"#f44336"+"|";
+					//debugger;
+					}
+				}
+			}
+		}
+	}
+	else if(selection==1)
+	{
+		words[1]="";
+		for(var l in pt){
+			 //debugger;
+			if(l >= min_date && l < max_date)
+			{
+				for(var i in pt[l]){
+					if( !isNaN(pt[l][pt[l][i]]))
+					{
+						//debugger;
+						words[1]=words[1]+""+l+"*"+pt[l][i]+"*"+pt[l][pt[l][i]]+"*"+"#b8860b"+"|";
+					//debugger;
+					}
+				}
+			}
+		}
+	}
+	else if(selection==2)
+	{
+		words[2]="";
+		for(var l in mt){
+			 //debugger;
+			if(l >= min_date && l < max_date)
+			{
+				for(var i in mt[l]){
+					if( !isNaN(mt[l][mt[l][i]]))
+					{
+						//debugger;
+						words[2]=words[2]+""+l+"*"+mt[l][i]+"*"+mt[l][mt[l][i]]+"*"+"green"+"|";
+					//debugger;
+					}
+				}
+			}
+		}
+	}
+	else if(selection==3)
+	{
+		words[3]="";
+		for(var l in lt){
+			 //debugger;
+			if(l >= min_date && l < max_date)
+			{
+				for(var i in lt[l]){
+					if( !isNaN(lt[l][lt[l][i]]))
+					{
+						//debugger;
+						words[3]=words[3]+""+l+"*"+lt[l][i]+"*"+lt[l][lt[l][i]]+"*"+"#008CBA"+"|";
+					//debugger;
+					}
+				}
+			}
+		}
+	}
+	else if(selection==4)
+	{
+		words[4]="";
+		words[4]=words[0]+"|"+words[1]+"|"+words[2]+"|"+words[3];
+			console.log(words[4]);	
+	}
+    vis.update(getWords(selection))
 	
 	//console.log(color);
     //vis.update(getWords(i ++ % words.length))
@@ -698,28 +619,11 @@ var min_date="200411";
 var max_date="201610";
 function disply(sm,sy,em,ey)
 {
-	console.log(sm);
-	var sm=sm;
-	var sy=sy;
-	var em=em;
-	var ey=ey;
-	if((sm.length)==1)
-		sm="0"+sm;
-	if((em.length)==1)
-		em="0"+em
-	d=d3.time.format("%m/%d/%Y").parse;
-	d1=d3.time.format("%Y-%m-%d").parse;
 	min_date=sy+""+sm;
 	max_date=ey+""+em;
-	asd();
-	showNewWords(myWordCloud, 1);
+	//asd();
+	showNewWords(myWordCloud, selection);
 }
-function asd()
-{
-	console.log(min_date+" "+max_date);
-}
-//Start cycling through the demo data
-
   $(function() {
     $( "#slider-range" ).slider({
       range: true,
@@ -730,25 +634,278 @@ function asd()
       slide: function( event, ui ) {
 		$d0=new Date(ui.values[ 0 ] *1000);
 		$d1=new Date(ui.values[ 1 ] *1000);
-		$smm=($d0.getMonth()+1);
-		$emm=($d1.getMonth()+1);
+		temp = "0";
+		if($d0.getMonth() < 9)
+			$smm=(temp.concat($d0.getMonth()+1));
+		else
+			$smm=$d0.getMonth()+1;
+		if($d1.getMonth() < 9)
+			$emm=(temp.concat($d1.getMonth()+1));
+		else
+			$emm=$d1.getMonth()+1;
+			
 		$sdd=($d0.getDate());
 		$edd=($d1.getDate());
 		$syy=$d0.getFullYear();
 		$eyy=$d1.getFullYear();
-		//console.log($.trim(smm).length);
-//		$min_date=$syy+""+$smm;
-	//	$max_date=$eyy+""+$emm;
-		//$start_date=$smm+"-"+$sdd+"-"+$syy;
-		//$end_date=$emm+"-"+$edd+"-"+$eyy;
+		min_date=$syy+""+$smm;
+		max_date=$eyy+""+$emm;
+		 x.domain([parseDate.parse(min_date),parseDate.parse(max_date)])
+		//y.domain([1,400])
         $( "#amount" ).val( $smm+"/"+$sdd+"/"+$syy+"-"+ $emm+"/"+$edd+"/"+$eyy);
-		//console.log($smm);
-		//debugger;
-		 disply($smm,$syy,$emm,$eyy);
+		//disply($smm,$syy,$emm,$eyy);
+		showNewWords(myWordCloud, selection);
       }
     });
     $( "#amount" ).val( (new Date($( "#slider-range" ).slider( "values", 0 )*1000).toDateString()) +
       "   -   " + (new Date($( "#slider-range" ).slider( "values", 1 )*1000)).toDateString());
 	
   });
+  
+  
+  
+  
+  /****************************************** Line Graph Code **********************************************/
+  var terms;
+    var parseDate = d3.time.format("%Y%m");
+    var minYear = 2006;
+    var maxYear = 2015;
+    var sourceList = {};
+    d3.tsv("wikinews.tsv", function(error, data_) {
+        if (error) throw error;
+        data = data_;
+
+        terms = new Object();
+        termMaxMax = 1;
+        data.forEach(function(d) {
+            d.source = d["source"];
+            // Process date
+            var curDate = Date.parse(d["time"]);
+            d.date = new Date(d["time"]);
+            var year = d.date.getFullYear();
+            var m =  12*(year-minYear) + d.date.getMonth();
+            d.m = m;
+
+            if (year>=minYear && year<=maxYear){
+                // Add source to sourceList
+                if (!sourceList[d.source])
+                    sourceList[d.source]=1;
+                else
+                    sourceList[d.source]++;
+            }
+
+            if (d["person"] != ""){
+                var list = d["person"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "person";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+                        }
+                    }
+                }
+            }
+
+            if (d["location"] != "" && d["location"] != 1){
+                var list = d["location"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "location";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+
+                        }
+                    }
+                }
+            }
+            if (d["organization"] != "" && d["organization"] != 1){
+                var list = d["organization"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "organization";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+
+                        }
+                    }
+                }
+            }
+            if (d["miscellaneous"] != "" && d["miscellaneous"] != 1){
+                var list = d["miscellaneous"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "miscellaneous";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+
+                        }
+                    }
+                }
+            }
+
+        });
+        console.log("DONE reading the input file = "+data.length);
+		debugger;
+    })
+    var color=d3.scale.category20();
+    var selarr=[];
+    var currentLegendY=0;
+	var margin = {top: 30, right: 10, bottom: 30, left: 25},
+            width =550 - margin.left - margin.right,
+            height = 330 - margin.top - margin.bottom;
+
+    var x = d3.time.scale().range([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+    x.domain([parseDate.parse(min_date),parseDate.parse(max_date)])
+    y.domain([1,50])
+	var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(10);
+	var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(7);
+	var valueline = d3.svg.line()
+            .interpolate("basis")
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.freq); });
+	var svg = d3.select(chart1)
+            .append("svg")
+            .style("padding","10px")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("class","graphid")
+            .append("g")
+            .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+		
+		svg.append("g")            // Add the X Axis
+            .attr("class", "x axis")
+            .style("fill", "black")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis)
+            .append("text")
+            //  .style("fill", "steelblue")
+            .attr("transform", "rotate(0)")
+            .attr("y", -15)
+            .attr("x", 450)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Time");
+
+    svg.append("g")
+			.attr("class", "y axis")
+			.style("fill", "black")
+			.call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Frequency");
+
+function plot(input){
+	//console.log("click");
+	//document.getElementById("chart1").innerHTML ="";
+    //y.domain([1,400])
+    var currTerm=[];
+    //console.log(terms[input])
+    if(terms[input]) {
+        for (var monthno in terms[input]) {
+            if (monthno == "max" || monthno == "maxMonth" || monthno == "category") {
+            }
+            else {
+                var year = Math.floor(monthno / 12) + 2006;
+                var month = (monthno + 1) % 12;
+                date = parseDate.parse(year + " " + month);
+                currTerm.push({"date": date, "freq": terms[input][monthno]})
+            }
+        }
+        currTerm.sort(function (a, b) {
+            return a.date - b.date;
+        })
+
+        y.domain([d3.min(currTerm, function (a) {
+            return a.freq
+        })
+            , d3.max(currTerm, function (a) {
+                return a.freq
+            })])
+		//debugger;
+		x.domain([parseDate.parse(min_date),parseDate.parse(max_date)])
+        svg.select(".y.axis").call(yAxis);
+		svg.select(".x.axis").call(xAxis);
+        svg
+                .append("path")        // Add the valueline path.
+                .attr("class", "line1")
+                .attr("stroke-width", 2)
+                .attr("stroke", function (d) {
+					debugger;
+                    return color(1);
+                })
+                .attr("stroke", function (d) {
+                    return color(input);
+                })
+                .attr("d", function (d) {
+                    return valueline(currTerm)
+                })
+    }
+}
+
+
+    function plotgraph() {
+	 
+        var input=document.getElementById("input").value;
+
+            plot(input);
+
+    }
 </script>
