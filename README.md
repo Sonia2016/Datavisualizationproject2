@@ -6,6 +6,29 @@ Text and Geospatial visualization
 In this project, students will work on the texts extracted from news/blogs and classified into 4 categories: people names, locations, organizations, and miscellaneous. Each entry also contains the published time/date of the article/blog.
 Students are provided 2 datasets: The Wikinews data (roughly 3.3M) contains 11,267 articles and the Huffington Post data (roughly 29.4M) contains 75,293 political blogs. Students are required to demonstrate their web applications on both datasets.
 
+### Technique
+We use javascript for the parsing our data. For each part of our project we have special object for that.
+1. Top 50 frequency
+  1. One object for each categories for restoring 50 top frequent and corresponding occurance
+  2. One object for each month and restoring the terms and corresponding frequency of these terms in that date
+2. Top 50 relationship
+  1. one object for restoring the blogs that each terms happens
+  2. one object for relationship between different pairs of relationship
+3. Location mapping
+  1. check the longitute and lantitude of top 50 locations and restore in specific objects
+
+## Wordle
+
+## Timeseries
+
+## Relationship
+
+
+
+## Map
+
+
+
 ### First meeting - October 19
 #### Check the problem definition
 For each of bullet we check our understanding and check to each other
