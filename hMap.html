@@ -50,35 +50,18 @@ li a {
   <li><a href="https://sonia2016.github.io/Datavisualizationproject2/wMap.html">Location map - wikinews</a></li>
   <li><a href="https://sonia2016.github.io/Datavisualizationproject2/hMap.html">Location map - huffington</a></li>
 </ul>
- <body>
+ <body onload="legendDemo()">
  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="datamaps.world.min.js"></script>
+<script src="http://d3js.org/colorbrewer.v1.min.js"></script>
 <div style="height: 50px; "></div>
-<div><p align="center">In Huffington, see the most frequent countries, the below show the range</p></div>
-<div class="auto">
+<div><p align="center">In Wikinews, see the most frequent countries, the below show the range</p></div>
+<div id="vizcontainer">
+<svg></svg>
+</div>
+<script src="legend.js"></script>
 
-   <svg align="center" width="600" height="50">
-    <g transform="translate(140,20)">
-        <circle r="10" stroke="black" fill="#d9bdfe"></circle>
-        <text dx="15" dy="5">812-1078</text>
-    </g>
-     <g transform="translate(230,20)">
-        <circle r="10" stroke="black" fill="#68cdf6"></circle>
-        <text dx="15" dy="5">1083-1493</text>
-    </g>
-    <g transform="translate(325,20)">
-        <circle r="10" stroke="black" fill="#f8c60e"></circle>
-        <text dx="15" dy="5">1507-2627</text>
-    </g>
-    <g transform="translate(420,20)">
-        <circle r="10" stroke="black" fill="#2ca02c"></circle>
-        <text dx="15" dy="5">2627-14312</text>
-    </g>
-      <p id="#display" align="center"></p>
-   </svg>
-   </div>
-<div class="auto">
 <div id="container" style="position: relative; width: 700px; height: 400px; margin: 0 auto"></div>
 <script>
 
@@ -123,6 +106,7 @@ function highFrequency(words,times){
 } 
 
 
+
 d3.tsv("https://sonia2016.github.io/Datavisualizationproject2/Data/huffington.tsv", function(error, weblog) {
 
  
@@ -161,17 +145,24 @@ var topMiscellaneous = [];
  
 
   //Frequency of each element
-  topOrganization = frequency(topOrganization);
-  topPerson = frequency(topPerson);
   topLocation = frequency(topLocation);
-  topMiscellaneous = frequency(topMiscellaneous);
+
 
   
    //top 50 frequency of each categories
-  top50Location = highFrequency(topLocation,100);
+  top50Location = highFrequency(topLocation,50);
 
-var countries = Datamap.prototype.worldTopo.objects.world.geometries;
 
+
+  var listcnt = [];
+  var countries = Datamap.prototype.worldTopo.objects.world.geometries;
+  for (var i = 0, j = countries.length; i < j; i++){ 
+    for(var loc in top50Location){
+        if(loc.toLowerCase() == countries[i].properties.name.toLowerCase()){
+          listcnt.push(countries[i].id);
+        }
+    }
+  }
 
 var freData = {cnt:[]};    
 d3.csv("long.csv", function(error, long) {
@@ -182,13 +173,12 @@ for(l in top50Location){
     if(long[j].name.toLowerCase() == l.toLowerCase()){
 for (var i = 0; i< countries.length; i++)
  if(l.toLowerCase() == countries[i].properties.name.toLowerCase()){
-  size = top50Location[l]/10;
     if(top50Location[l]>= 812 && top50Location[l]<=1078){
        freData.cnt.push({
         name: l,
         freq: top50Location[l],
         fillKey: 'first',
-         radius: Math.sqrt(top50Location[l])/5,
+         radius: Math.sqrt(top50Location[l])/4,
           latitude: long[j].latitude,
             longitude: long[j].longitude
     
@@ -198,7 +188,7 @@ for (var i = 0; i< countries.length; i++)
         name: l,
         freq: top50Location[l],
         fillKey: 'second',
-         radius: Math.sqrt(top50Location[l])/5,
+         radius: Math.sqrt(top50Location[l])/4,
           latitude: long[j].latitude,
             longitude: long[j].longitude
     
@@ -209,18 +199,18 @@ for (var i = 0; i< countries.length; i++)
         name: l,
         freq: top50Location[l],
         fillKey: 'third',
-         radius: Math.sqrt(top50Location[l])/5,
+         radius: Math.sqrt(top50Location[l])/4,
           latitude: long[j].latitude,
             longitude: long[j].longitude
     
         })
        }
-       else if(top50Location[l]>=2627 || top50Location[l]<= 14312){
+       else if(top50Location[l]>2627 || top50Location[l]<= 14312){
          freData.cnt.push({
         name: l,
         freq: top50Location[l],
         fillKey: 'forth',
-         radius: Math.sqrt(top50Location[l])/6,
+         radius: Math.sqrt(top50Location[l])/4,
           latitude: long[j].latitude,
             longitude: long[j].longitude
     
@@ -230,7 +220,7 @@ for (var i = 0; i< countries.length; i++)
 }
 }
 
- console.log(freData);
+
   var freqMap = new Datamap({
     element: document.getElementById('container'),
     scope: 'world',
@@ -239,44 +229,51 @@ for (var i = 0; i< countries.length; i++)
         popupOnHover: true,
         highlightOnHover: true
     },
+
     fills: {
-        'first': '#d9bdfe',
-        'second': '#68cdf6',
-        'third': '#f8c60e',
-        'forth': '#2ca02c',
+        'first': '#fee5d9',
+        'second': '#fcae91',
+        'third': '#fb6a4a',
+        'forth': '#cb181d',
         defaultFill: '#aab9b9'
     }
 });
 
-      freData.cnt.push({
-        name: 'United state',
-        radius: Math.sqrt(7443)/5,
-        freq: 7443,
-        fillKey: 'forth',
-        latitude: 37.09024,
-        longitude: -95.712891
-      });
+// freqMap.updateChoropleth({'AFG': 'green'});
+for(var i = 0 ;i < listcnt.length; i++){
+  var temp = listcnt[i];
+  freqMap.updateChoropleth({temp: 'green'});
+}
 
      freData.cnt.push({
+        name: 'United States',
+        radius: Math.sqrt(2207)/3,
+        freq: 2207,
+        fillKey: 'forth',
+        latitude: 37.0902,
+        longitude: -95.7129
+      });
+
+   freData.cnt.push({
+        name: 'Iran',
+        radius: Math.sqrt(451)/3,
+        freq: 451,
+        fillKey: 'forth',
+        latitude: 32.4279,
+        longitude: 53.6880
+      });
+  
+   freData.cnt.push({
         name: 'Russia',
-        radius: Math.sqrt(3443)/5,
-        freq: 3443,
+        radius: Math.sqrt(699)/3,
+        freq: 699,
         fillKey: 'forth',
         latitude: 61.52401,
         longitude: 105.318756
       });
 
-      freData.cnt.push({
-        name: 'Iran',
-        radius: Math.sqrt(6065)/5,
-        freq: 6065,
-        fillKey: 'forth',
-        latitude: 37.0902,
-        longitude: 51.416667
-      });
-
      var frequencyData = freData.cnt;
- debugger;
+ 
 
 //draw bubbles for frequencyData
 freqMap.bubbles(frequencyData, {
@@ -287,9 +284,26 @@ freqMap.bubbles(frequencyData, {
     }
 });
 });
- 
+
 
 });
+</script>
+
+<script>
+  function legendDemo() {
+
+  sampleNumerical = [1078,1493,2627,14312];
+  debugger;
+    sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(colorbrewer.Reds[4]);
+  horizontalLegend = d3.svg.legend().units("Freq").cellWidth(50).cellHeight(10).inputScale(sampleThreshold).cellStepping(100);
+
+  d3.select("svg").append("g").attr("transform", "translate(50,70)").attr("class", "legend").call(horizontalLegend);
+
+  sampleCategoricalData = ["Something","Something Else", "Another", "This", "That", "Etc"]
+  sampleOrdinal = d3.scale.category20().domain(sampleCategoricalData);
+
+
+  }
 </script>
    </body>    
  </html>
