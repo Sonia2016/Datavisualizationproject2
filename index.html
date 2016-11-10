@@ -82,6 +82,37 @@ li a {
     height: 1500px; /* Used in this example to enable scrolling */
 }
 
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+      width: 50%;
+    height: 40%;
+    margin: 10px;
+}
+
+.card img {
+    width: 60% !important;
+    height: 100% !important;
+    padding-top:10px;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Add some padding inside the card container */
+.container {
+    padding: 2px 16px;
+}
+
+.dashboard{
+  margin-top: 50px;
+}
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+
 </style>
 <body>
 <ul class="tab">
@@ -95,47 +126,88 @@ li a {
 </ul>
 
 <div class="main">
-<div style="height: 40px; "></div>
-<div >
+<div style="height: 10px; "></div>
+<div class="dashboard" >
 <table style="width:100%" align="center">
-    <tr align="center">
-    <th>Source</th>
-    <th>Timeseries/wordle</th>
-    <th>Relationship</th> 
-    <th>Location</th>
+
+    
   </tr>
 
-      <tr align="center">
-  <td>Wikinews</td>
-    <td>
-        <a href="https://sonia2016.github.io/Datavisualizationproject2/wordle/wordle.html">
-        <img src="wordle.png" title="Wordle - wikinews" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
-      </a> 
-    </td>
-    <td>
-      <a href="https://sonia2016.github.io/Datavisualizationproject2/wbundle.html">
-        <img src="rWiki.png" title="Relationship - wikinews" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
-      </a>
-    </td> 
-    <td>
-      <a href="https://sonia2016.github.io/Datavisualizationproject2/wMap.html">
-        <img src="mWikinews.png" title="Location map - wikinews" alt="HTML tutorial" style="width:120px;height:100px;border:0;">
-      </a>
-    </td>
+    <tr align="center">
+      <td>
+      <a href="https://sonia2016.github.io/Datavisualizationproject2/wordle/wordle.html">   
+        <div class="card">
+          <img src="time.png" alt="Avatar" style="width:100%">
+          </a>
+          <div class="container">
+            <h4><b>Wordle</b></h4> 
+            <p>Wikinewes</p> 
+          </div>
+        </div>
+        
+      </td>
+      <td>
+        <a href="https://sonia2016.github.io/Datavisualizationproject2/wbundle.html">   
+          <div class="card">
+            <img src="relation.png" alt="Avatar" style="width:100%">
+            </a>
+            <div class="container">
+              <h4><b>Relationship</b></h4> 
+              <p>Wikinewes</p> 
+            </div>
+          </div>
+        
+      </td> 
+      <td>
+        <a href="https://sonia2016.github.io/Datavisualizationproject2/wMap.html">   
+          <div class="card">
+            <img src="globe.png" alt="Avatar" style="width:100%">
+            </a>
+            <div class="container">
+              <h4><b>Location</b></h4> 
+              <p>Wikinewes</p> 
+            </div>
+          </div>
+        
+      </td>
   </tr>
       <tr align="center">
-  <td>Huffington</td>
-    <td>Eve</td>
-    <td>
-      <a href="https://sonia2016.github.io/Datavisualizationproject2/hbundle.html">
-        <img src="rhuffington.png" title="Relationship - huffington" alt="HTML tutorial" style="width:100px;height:100px;border:0;">
-      </a>
-    </td> 
-    <td>
-      <a href="https://sonia2016.github.io/Datavisualizationproject2/hMap.html">
-        <img src="mHuffington.png" title="Location map - huffington" alt="HTML tutorial" style="width:120px;height:100px;border:0;">
-      </a>
-    </td>
+      <td>
+      <a href="https://sonia2016.github.io/Datavisualizationproject2/wordle/wordle.html">   
+        <div class="card">
+          <img src="time.png" alt="Avatar" style="width:100%">
+          </a>
+          <div class="container">
+            <h4><b>Wordle</b></h4> 
+            <p>Wikinewes</p> 
+          </div>
+        </div>
+        
+      </td>
+      <td>
+        <a href="https://sonia2016.github.io/Datavisualizationproject2/hbundle.html">   
+          <div class="card">
+            <img src="relation.png" alt="Avatar" style="width:100%">
+            </a>
+            <div class="container">
+              <h4><b>Relationship</b></h4> 
+              <p>Wikinewes</p> 
+            </div>
+          </div>
+        
+      </td> 
+      <td>
+        <a href="https://sonia2016.github.io/Datavisualizationproject2/hMap.html">   
+          <div class="card">
+            <img src="globe.png" alt="Avatar" style="width:100%">
+            </a>
+            <div class="container">
+              <h4><b>Location</b></h4> 
+              <p>Wikinewes</p> 
+            </div>
+          </div>
+        
+      </td>
   </tr>
 
   </tr>
@@ -147,4 +219,3 @@ li a {
 
 
 
-<script src="//d3js.org/d3.v3.min.js"></script>
