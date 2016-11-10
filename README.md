@@ -22,6 +22,24 @@ We use javascript for the parsing our data. For each part of our project we have
 ## Timeseries
 
 ## Relationship
+For two data set that we have (wikinews and huffington), we implemented two different chart for each of them that can be see as a following
+Wikinews:
+### Overal picture
+It show dynamically the relationship between two different items.
+<img width="1280" alt="wb" src="https://cloud.githubusercontent.com/assets/19417775/20195104/c63c2c82-a75a-11e6-8edb-d75835baacc4.png">
+note: huffington is not dynamic.
+### Mouseover-Mouseout
+Whenever you mouse over on each term it shows the relationship between that to others
+<img width="1280" alt="mouseover" src="https://cloud.githubusercontent.com/assets/19417775/20195106/c63ed342-a75a-11e6-9072-fb713d19a4d8.png">
+When you mouseout you reset the relationship.
+
+### Search
+You can search whatever you want and it shows the suggestion for your search
+<img width="1280" alt="search-2" src="https://cloud.githubusercontent.com/assets/19417775/20195103/c63ac112-a75a-11e6-9495-a8da44e0e6f0.png">
+With click on search button it show the term and its relationship
+<img width="1280" alt="searchr" src="https://cloud.githubusercontent.com/assets/19417775/20195105/c63de798-a75a-11e6-86a9-8693f8da7570.png">
+With click on the reset button you reset your search box and also the arc diagram.
+
 
 
 
