@@ -1,5 +1,6 @@
 # Visualization Project 2
 Text and Geospatial visualization
+<img width="1280" alt="screen shot 2016-11-10 at 3 37 16 pm" src="https://cloud.githubusercontent.com/assets/19417775/20195305/967d9566-a75b-11e6-8ee9-21467a86332a.png">
 
 
 ## Data Processing
