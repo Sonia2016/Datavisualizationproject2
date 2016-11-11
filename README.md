@@ -123,7 +123,8 @@ the next meeting is Monday at 11am
 We talk about our visualization on relationships and also how should present the time-series.
 ##### Action List
 - [X] Sonia is working on relationship, adding agenda, when click what should appears.
-- [ ] Brindivani is working on montly term frequency
+- [X] Brindivani is working on montly term frequency
+- She tried to do it but because of she doesn't have enough experiece she did as a initial template
 - [X] Arun is working on time series and frequency
 
 ### Fifth meeting - November 2
@@ -135,8 +136,8 @@ We talk about our visualization on relationships and also how should present the
 
 ### Sixth meeting - November 4
 #### Discussion
-- [ ] We worked on the time slider and frequent words
-- [ ] We also work on the relationship for the dynamic data
+- [X] We worked on the time slider and frequent words
+- [X] We also work on the relationship for the dynamic data
 
 ### Seventh meeting - November 7
 #### Discussion
