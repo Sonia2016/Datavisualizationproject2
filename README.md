@@ -1,6 +1,8 @@
 # Visualization Project 2
 Text and Geospatial visualization
-Link to Demo: https://sonia2016.github.io/Datavisualizationproject2/index.html
+
+- Link to Demo: https://sonia2016.github.io/Datavisualizationproject2/index.html
+- Youtube video: https://youtu.be/5iRrNaHOY6c
 
 <img width="1280" alt="screen shot 2016-11-10 at 10 05 31 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204041/d6546134-a791-11e6-92a8-0448174716c8.png">
 
