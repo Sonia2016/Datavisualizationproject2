@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+        .graphid path {
+
+            fill: none;
+
+
+        }
+    </style>
+</head>
+<body>
+<input type="text" id="input">
+<button onclick="plotgraph()">plot</button>
+</body>
+<script>
+    var terms;
+    var parseDate = d3.time.format("%Y %m");
+    var minYear = 2006;
+    var maxYear = 2015;
+    var sourceList = {};
+    var selectedTerms=[];
+    d3.tsv("wikinews.tsv", function(error, data_) {
+        if (error) throw error;
+        data = data_;
+
+        terms = new Object();
+        termMaxMax = 1;
+        data.forEach(function(d) {
+            d.source = d["source"];
+            // Process date
+            var curDate = Date.parse(d["time"]);
+            d.date = new Date(d["time"]);
+            var year = d.date.getFullYear();
+            var m =  12*(year-minYear) + d.date.getMonth();
+            d.m = m;
+
+            if (year>=minYear && year<=maxYear){
+                // Add source to sourceList
+                if (!sourceList[d.source])
+                    sourceList[d.source]=1;
+                else
+                    sourceList[d.source]++;
+            }
+
+            if (d["person"] != ""){
+                var list = d["person"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "person";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+                        }
+                    }
+                }
+            }
+
+            if (d["location"] != "" && d["location"] != 1){
+                var list = d["location"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "location";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+
+                        }
+                    }
+                }
+            }
+            if (d["organization"] != "" && d["organization"] != 1){
+                var list = d["organization"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "organization";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+
+                        }
+                    }
+                }
+            }
+            if (d["miscellaneous"] != "" && d["miscellaneous"] != 1){
+                var list = d["miscellaneous"].split("|");
+                for (var i=0; i<list.length;i++){
+                    var term = list[i];
+                    d[term] = 1;
+                    if (!terms[term]){
+                        terms[term] = new Object();
+                        terms[term].max = 0;
+                        terms[term].maxMonth = -100;   // initialized negative
+                        terms[term].category = "miscellaneous";
+                    }
+                    if (!terms[term][m])
+                        terms[term][m] = 1;
+                    else{
+                        terms[term][m] ++;
+                        if (terms[term][m]>terms[term].max){
+                            terms[term].max = terms[term][m];
+                            terms[term].maxMonth = m;
+                            if (terms[term].max>termMaxMax)
+                                termMaxMax = terms[term].max;
+
+                        }
+                    }
+                }
+            }
+
+        });
+        console.log("DONE reading the input file = "+data.length);
+
+    })
+    var color=d3.scale.category20();
+
+    var selarr=[];
+
+    var currentLegendY=0;
+
+
+
+    var margin = {top: 30, right: 10, bottom: 30, left: 25},
+
+            width =650 - margin.left - margin.right,
+
+            height = 430 - margin.top - margin.bottom;
+
+
+    var x = d3.time.scale().range([0, width]);
+
+    var y = d3.scale.linear().range([height, 0]);
+
+    x.domain([parseDate.parse("2004 01"),parseDate.parse("2016 01")])
+    y.domain([1,400])
+
+
+
+
+
+    var xAxis = d3.svg.axis().scale(x)
+
+            .orient("bottom").ticks(10);
+
+
+
+    var yAxis = d3.svg.axis().scale(y)
+
+            .orient("left").ticks(7);
+
+
+
+
+
+    var valueline = d3.svg.line()
+
+            .interpolate("basis")
+
+            .x(function(d) { return x(d.date); })
+
+            .y(function(d) { return y(d.freq); });
+
+
+
+    var svg = d3.select("body")
+
+            .append("svg")
+            .style("padding","10px")
+            .attr("width", width + margin.left + margin.right)
+
+            .attr("height", height + margin.top + margin.bottom)
+
+            .attr("class","graphid")
+
+            .append("g")
+
+
+            .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+
+
+
+
+
+
+
+
+
+
+
+
+    svg.append("g")            // Add the X Axis
+
+            .attr("class", "x axis")
+
+            .style("fill", "steelblue")
+
+            .attr("transform", "translate(0," + height + ")")
+
+            .call(xAxis)
+
+            .append("text")
+
+            //  .style("fill", "steelblue")
+
+            .attr("transform", "rotate(0)")
+
+            .attr("y", -15)
+
+            .attr("x", 605)
+
+            .attr("dy", ".71em")
+
+            .style("text-anchor", "end")
+
+            .text("Time");
+
+
+
+    svg.append("g")
+
+            .attr("class", "y axis")
+
+            .style("fill", "steelblue")
+
+
+
+            .call(yAxis)
+
+            .append("text")
+
+            .attr("transform", "rotate(-90)")
+
+            .attr("y", 6)
+
+            .attr("dy", ".71em")
+
+            .style("text-anchor", "end")
+
+            .text("Frequency");
+
+function plot(input){
+
+
+    var currTerm=[];
+    //console.log(terms[input])
+    if(terms[input]) {
+        for (var monthno in terms[input]) {
+            if (monthno == "max" || monthno == "maxMonth" || monthno == "category") {
+            }
+            else {
+                var year = Math.floor(monthno / 12) + 2006;
+                var month = (monthno + 1) % 12;
+                date = parseDate.parse(year + " " + month);
+                currTerm.push({"date": date, "freq": terms[input][monthno]})
+            }
+        }
+        currTerm.sort(function (a, b) {
+            return a.date - b.date;
+        })
+
+        y.domain([d3.min(currTerm, function (a) {
+            return a.freq
+        })
+            , d3.max(currTerm, function (a) {
+                return a.freq
+            })])
+
+        svg.select(".y.axis").call(yAxis);
+        svg
+                .append("path")        // Add the valueline path.
+
+                .attr("class", "line1")
+
+                .attr("stroke-width", 2)
+
+
+                .attr("stroke", function (d) {
+
+                    return color(1);
+
+                })
+                .attr("stroke", function (d) {
+
+                    return color(input);
+
+                })
+
+                .attr("d", function (d) {
+
+                    return valueline(currTerm)
+
+                })
+
+
+    }
+
+}
+
+
+    function plotgraph() {
+        var input=document.getElementById("input").value;
+
+            plot(input);
+
+    }
+
+</script>
+</html>
