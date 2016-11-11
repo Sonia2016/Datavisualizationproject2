@@ -15,7 +15,7 @@ We use javascript for the parsing our data. For each part of our project we have
   2. One object for each month and restoring the terms and corresponding frequency of these terms in that date
 2. Top 50 relationship
   1. one object for restoring the blogs that each terms happens
-  2. one object for relationship between different pairs of relationship
+  2. one object for relationship between different pairs of terms
 3. Location mapping
   1. check the longitute and lantitude of top 50 locations and restore in specific objects
 
