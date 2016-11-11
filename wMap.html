@@ -223,10 +223,10 @@ for (var i = 0; i< countries.length; i++)
     },
 
     fills: {
-        'first': '#fee5d9',
-        'second': '#fcae91',
-        'third': '#fb6a4a',
-        'forth': '#cb181d',
+        'first': '#80CBC4',
+        'second': '#26A69A',
+        'third': '#00695C',
+        'forth': '#004D40',
         defaultFill: '#aab9b9'
     }
 });
@@ -254,8 +254,8 @@ freqMap.bubbles(frequencyData, {
   function legendDemo() {
 
   sampleNumerical = [218,335,474,1035];
-  debugger;
-    sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(colorbrewer.Reds[4]);
+  sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(
+      ["#80CBC4","#26A69A","#00695C","#004D40"]);
   horizontalLegend = d3.svg.legend().units("Freq").cellWidth(45).cellHeight(15).inputScale(sampleThreshold).cellStepping(100);
 
   d3.select("svg").append("g").attr("transform", "translate(50,70)").attr("class", "legend").call(horizontalLegend);
