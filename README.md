@@ -47,7 +47,6 @@ Select the slider to know zoom into time interval
 
 ## Timeseries - Brinidivani
 We have some initial work for the timeseries that let us insert the term and shows the corresponding frequency during the date from 2004 - 2015.
-<img width="1280" alt="screen shot 2016-11-11 at 11 08 55 am" src="https://cloud.githubusercontent.com/assets/19417775/20223454/609b1eba-a7ff-11e6-9f9c-9e1cb4d41a5e.png">
 <img width="1280" alt="screen shot 2016-11-11 at 11 09 09 am" src="https://cloud.githubusercontent.com/assets/19417775/20223455/60ad64f8-a7ff-11e6-8b76-ee834ab98216.png">
 <img width="1280" alt="screen shot 2016-11-11 at 11 09 22 am" src="https://cloud.githubusercontent.com/assets/19417775/20223456/60b0902e-a7ff-11e6-8471-ed2974a8abf5.png">
 
