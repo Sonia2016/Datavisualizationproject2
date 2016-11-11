@@ -25,18 +25,23 @@ Wordle to display top frequency words from  all four category.
 ![w1](https://cloud.githubusercontent.com/assets/19417775/20223287/994b088e-a7fe-11e6-9ce1-0f9cc6397d58.png)
 
 Wordle to display top frequency words from  Person category.
+![w2](https://cloud.githubusercontent.com/assets/19417775/20223289/995cb6ba-a7fe-11e6-8048-15e69301d475.png)
 
 Wordle to display top frequency words from  organization category.
+![w3](https://cloud.githubusercontent.com/assets/19417775/20223290/995da67e-a7fe-11e6-932c-c2127ccaf0d0.png)
 
 
 Wordle to display top frequency words from  location category.
+![w4](https://cloud.githubusercontent.com/assets/19417775/20223293/995f920e-a7fe-11e6-9de6-519619f9a648.png)
 
 Wordle to display top frequency words from  miscellaneous category.
+![w5](https://cloud.githubusercontent.com/assets/19417775/20223292/995f52f8-a7fe-11e6-9be5-357a9c591975.png)
 
 Mouse over on a word  to know its frequency in the specific time frame.
+![w6](https://cloud.githubusercontent.com/assets/19417775/20223291/995f3c14-a7fe-11e6-8388-3f385882aba5.png)
 
 Select the slider to know zoom into time interval
-
+![w7](https://cloud.githubusercontent.com/assets/19417775/20223288/99587eec-a7fe-11e6-8a8c-f5cf2d5f0cfe.png)
 
 
 ## Timeseries
