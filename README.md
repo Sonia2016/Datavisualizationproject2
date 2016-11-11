@@ -103,6 +103,7 @@ Different size of circle and also different color shows how many times terms ape
 ## Our Story
 
 The war and presidency of USA appear that moment, for example the Iraq and also the Afghanistan appear more alot because of the war time that was 2004 - 2011.
+You can also can see the most important place of the world that duration people are talking and posting about that, Middle East, USA!
 For example in the map you can see the bigger circle and most frequency of data in those location.
 ### Huffington
 <img width="1280" alt="screen shot 2016-11-10 at 10 10 27 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204119/8e21ad30-a792-11e6-8fed-692985f8e80c.png">
