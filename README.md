@@ -9,6 +9,7 @@ Students are provided 2 datasets: The Wikinews data (roughly 3.3M) contains 11,2
 
 ### Technique
 We use javascript for the parsing our data. For each part of our project we have special object for that.
+
 1. Top 50 frequency
   1. One object for each categories for restoring 50 top frequent and corresponding occurance
   2. One object for each month and restoring the terms and corresponding frequency of these terms in that date
