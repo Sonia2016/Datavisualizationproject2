@@ -19,6 +19,25 @@ We use javascript for the parsing our data. For each part of our project we have
   1. check the longitute and lantitude of top 50 locations and restore in specific objects
 
 ## Wordle
+We have implemented wordle to display Top frequency words from the dataset. We have implemented wordle for four different  categories to display its top frequency and one wordle to display combination of top frequency words from these four categories.
+
+Wordle to display top frequency words from  all four category.
+![w1](https://cloud.githubusercontent.com/assets/19417775/20223287/994b088e-a7fe-11e6-9ce1-0f9cc6397d58.png)
+
+Wordle to display top frequency words from  Person category.
+
+Wordle to display top frequency words from  organization category.
+
+
+Wordle to display top frequency words from  location category.
+
+Wordle to display top frequency words from  miscellaneous category.
+
+Mouse over on a word  to know its frequency in the specific time frame.
+
+Select the slider to know zoom into time interval
+
+
 
 ## Timeseries
 
