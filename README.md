@@ -54,7 +54,7 @@ We have some initial work for the timeseries that let us insert the term and sho
 For two data set that we have (wikinews and huffington), we implemented two different chart for each of them that can be see as a following
 Wikinews:
 ### Overal picture
-It show dynamically the relationship between two different items.
+It show dynamically the relationship between two different terms.
 #### Wikinews
 <img width="1280" alt="wb" src="https://cloud.githubusercontent.com/assets/19417775/20195104/c63c2c82-a75a-11e6-8edb-d75835baacc4.png">
 #### Huffington
