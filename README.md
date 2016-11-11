@@ -99,6 +99,16 @@ Different size of circle and also different color shows how many times terms ape
 ### Huffington
 <img width="1280" alt="screen shot 2016-11-10 at 10 10 27 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204119/8e21ad30-a792-11e6-8fed-692985f8e80c.png">
 
+
+## Our Story
+
+The war and presidency of USA appear that moment, for example the Iraq and also the Afghanistan appear more alot because of the war time that was 2004 - 2011.
+For example in the map you can see the bigger circle and most frequency of data in those location.
+### Huffington
+<img width="1280" alt="screen shot 2016-11-10 at 10 10 27 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204119/8e21ad30-a792-11e6-8fed-692985f8e80c.png">
+### Wikinews
+<img width="1280" alt="screen shot 2016-11-10 at 10 10 34 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204118/8e0b652a-a792-11e6-9336-b8d75931aa17.png">
+
 ## Group schedule
 ### First meeting - October 19
 #### Check the problem definition
