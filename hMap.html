@@ -54,16 +54,15 @@ li a {
  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="datamaps.world.min.js"></script>
-<script src="colorbrewer.v1.min.js"></script>
-   <script src="//d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/colorbrewer.v1.min.js"></script>
 <div style="height: 50px; "></div>
 <div><p align="center">In Huffington, see the most frequent countries, the below show the range</p></div>
-<div id="vizcontainer">
+<div id="vizcontainer" style="position: relative; width: 550px; height: 80px; margin: 0 auto" >
 <svg></svg>
 </div>
 <script src="legend.js"></script>
 
-<div id="container" style="position: relative; width: 700px; height: 400px; margin: 0 auto"></div>
+<div id="container" style="position: relative; width: 750px; height: 400px; margin: 0 auto"></div>
 <script>
 
 var frequency = function(words) {
@@ -108,7 +107,7 @@ function highFrequency(words,times){
 
 
 
-d3.tsv("https://sonia2016.github.io/Datavisualizationproject2/Data/huffington.tsv", function(error, weblog) {
+d3.tsv("huffington.tsv", function(error, weblog) {
 
  
   blogs =  d3.keys(weblog[0]).slice(0).map(function(id) {
@@ -128,20 +127,11 @@ blogs = blogs[0];
         else return 0;
   });
 
-var topOrganization = [];
-var topPerson = [];
 var topLocation = [];
-var topMiscellaneous = [];
 
   for(var i = 0 ; i < blogs.values.length; i++){
-    blogs.values[i].person = blogs.values[i].person.split('|');
     blogs.values[i].location = blogs.values[i].location.split('|');
-    blogs.values[i].miscellaneous = blogs.values[i].miscellaneous.split('|');
-    blogs.values[i].organization = blogs.values[i].organization.split('|');
-    topOrganization.push(blogs.values[i].organization);
     topLocation.push(blogs.values[i].location);
-    topMiscellaneous.push(blogs.values[i].miscellaneous);
-    topPerson.push(blogs.values[i].person);
   }
  
 
@@ -154,73 +144,90 @@ var topMiscellaneous = [];
   top50Location = highFrequency(topLocation,50);
 
 
-
-  var listcnt = [];
   var countries = Datamap.prototype.worldTopo.objects.world.geometries;
-  for (var i = 0, j = countries.length; i < j; i++){ 
-    for(var loc in top50Location){
-        if(loc.toLowerCase() == countries[i].properties.name.toLowerCase()){
-          listcnt.push(countries[i].id);
-        }
-    }
-  }
+ 
 
 var freData = {cnt:[]};    
 d3.csv("long.csv", function(error, long) {
-    console.log(long);
+    
 
-for(var j=0; j<long.length;j++)
-for(l in top50Location){
+for(var j=0; j<long.length;j++){
+  for(l in top50Location){
     if(long[j].name.toLowerCase() == l.toLowerCase()){
-for (var i = 0; i< countries.length; i++)
- if(l.toLowerCase() == countries[i].properties.name.toLowerCase()){
-    if(top50Location[l]>= 812 && top50Location[l]<=1078){
-       freData.cnt.push({
-        name: l,
-        freq: top50Location[l],
-        fillKey: 'first',
-         radius: Math.sqrt(top50Location[l])/4,
-          latitude: long[j].latitude,
-            longitude: long[j].longitude
-    
-        })}
-       else if(top50Location[l]>=1083 && top50Location[l]<=1493){
- freData.cnt.push({
-        name: l,
-        freq: top50Location[l],
-        fillKey: 'second',
-         radius: Math.sqrt(top50Location[l])/4,
-          latitude: long[j].latitude,
-            longitude: long[j].longitude
-    
-        })
+      for (var i = 0; i< countries.length; i++){
+        if(long[j].name.toLowerCase() == l.toLowerCase()){
+          for (var i = 0; i< countries.length; i++){
+              if(l.toLowerCase() == countries[i].properties.name.toLowerCase()|| 
+                  l.toLowerCase() == "russia" || l.toLowerCase() == "usa" || 
+                  l.toLowerCase() == "baghdad" ||
+                  l.toLowerCase() == "california" ||
+                  l.toLowerCase() == "england" || l.toLowerCase() == "europe" ||
+                  l.toLowerCase() == "florida" || l.toLowerCase() == "london" ||
+                  l.toLowerCase() == "middle east" || l.toLowerCase() == "new york"|| 
+                  l.toLowerCase() == "paris" || l.toLowerCase() == "sydney" ||
+                  l.toLowerCase() == "texas" || l.toLowerCase() == "washington" ||
+                  l.toLowerCase() == "africa" || l.toLowerCase()== "wisconsin"||
+                  l.toLowerCase() == "wall street" || l.toLowerCase()== "virginia"||
+                  l.toLowerCase() == "soviet union" || l.toLowerCase()== "south carolina" ||
+                  l.toLowerCase() == "san francisco" || l.toLowerCase()== "pentagon" || 
+                  l.toLowerCase() == "pennsylvania" || l.toLowerCase()== "ohio" || 
+                  l.toLowerCase() == "north carolina" || l.toLowerCase()== "new jersey" || 
+                  l.toLowerCase() == "new hampshire" || l.toLowerCase()== "michigan" || 
+                  l.toLowerCase() == "massachusetts" || l.toLowerCase()== "los angeles" || 
+                  l.toLowerCase() == "iowa" || l.toLowerCase()== "illinois" || 
+                  l.toLowerCase() == "d.c." || l.toLowerCase()== "colorado" || 
+                  l.toLowerCase() == "chicago" || l.toLowerCase()== "capitol hill" || 
+                  l.toLowerCase() == "arizona" || l.toLowerCase()== "alaska" || l.toLowerCase()== "iran"){
+                  if(top50Location[l]<=2000){
+                       freData.cnt.push({
+                        name: l,
+                        freq: top50Location[l],
+                        fillKey: 'first',
+                         radius: Math.sqrt(top50Location[l])/5,
+                          latitude: long[j].latitude,
+                            longitude: long[j].longitude
+                        })}
+                   else if(top50Location[l]>2000 && top50Location[l]<=3000){
+                       freData.cnt.push({
+                              name: l,
+                              freq: top50Location[l],
+                              fillKey: 'second',
+                               radius: Math.sqrt(top50Location[l])/5,
+                                latitude: long[j].latitude,
+                                  longitude: long[j].longitude
+                          
+                              })
+                   }
+                   else if(top50Location[l]>3000 && top50Location[l]<= 5000){
+                       freData.cnt.push({
+                              name: l,
+                              freq: top50Location[l],
+                              fillKey: 'third',
+                               radius: Math.sqrt(top50Location[l])/5,
+                                latitude: long[j].latitude,
+                                  longitude: long[j].longitude
+                          
+                              })
+                   }
+                   else if(top50Location[l]>5000 || top50Location[l]<= 14312){
+                     freData.cnt.push({
+                    name: l,
+                    freq: top50Location[l],
+                    fillKey: 'forth',
+                     radius: Math.sqrt(top50Location[l])/5,
+                      latitude: long[j].latitude,
+                        longitude: long[j].longitude
+                
+                    })
+                   }
+                 }
+               }
+             }
+           }
+         }
        }
-       else if(top50Location[l]>=1507 && top50Location[l]<= 2627){
- freData.cnt.push({
-        name: l,
-        freq: top50Location[l],
-        fillKey: 'third',
-         radius: Math.sqrt(top50Location[l])/4,
-          latitude: long[j].latitude,
-            longitude: long[j].longitude
-    
-        })
-       }
-       else if(top50Location[l]>2627 || top50Location[l]<= 14312){
-         freData.cnt.push({
-        name: l,
-        freq: top50Location[l],
-        fillKey: 'forth',
-         radius: Math.sqrt(top50Location[l])/4,
-          latitude: long[j].latitude,
-            longitude: long[j].longitude
-    
-        })
-       }
-}
-}
-}
-
+     }
+     
 
   var freqMap = new Datamap({
     element: document.getElementById('container'),
@@ -232,48 +239,17 @@ for (var i = 0; i< countries.length; i++)
     },
 
     fills: {
-        'first': '#fee5d9',
-        'second': '#fcae91',
-        'third': '#fb6a4a',
-        'forth': '#cb181d',
+        'first': '#80CBC4',
+        'second': '#26A69A',
+        'third': '#00695C',
+        'forth': '#004D40',
         defaultFill: '#aab9b9'
     }
-});
+    });
 
-// freqMap.updateChoropleth({'AFG': 'green'});
-for(var i = 0 ;i < listcnt.length; i++){
-  var temp = listcnt[i];
-  freqMap.updateChoropleth({temp: 'green'});
-}
 
-     freData.cnt.push({
-        name: 'United States',
-        radius: Math.sqrt(2207)/3,
-        freq: 2207,
-        fillKey: 'forth',
-        latitude: 37.0902,
-        longitude: -95.7129
-      });
 
-   freData.cnt.push({
-        name: 'Iran',
-        radius: Math.sqrt(451)/3,
-        freq: 451,
-        fillKey: 'forth',
-        latitude: 32.4279,
-        longitude: 53.6880
-      });
-  
-   freData.cnt.push({
-        name: 'Russia',
-        radius: Math.sqrt(699)/3,
-        freq: 699,
-        fillKey: 'forth',
-        latitude: 61.52401,
-        longitude: 105.318756
-      });
-
-     var frequencyData = freData.cnt;
+var frequencyData = freData.cnt;
  
 
 //draw bubbles for frequencyData
@@ -284,6 +260,7 @@ freqMap.bubbles(frequencyData, {
             '</div>'].join('');
     }
 });
+
 });
 
 
@@ -293,10 +270,10 @@ freqMap.bubbles(frequencyData, {
 <script>
   function legendDemo() {
 
-  sampleNumerical = [1078,1493,2627,14312];
-  debugger;
-    sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(colorbrewer.Reds[4]);
-  horizontalLegend = d3.svg.legend().units("Freq").cellWidth(50).cellHeight(10).inputScale(sampleThreshold).cellStepping(100);
+  sampleNumerical = [2000,3000,5000,14312];
+    sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(
+      ["#80CBC4","#26A69A","#00695C","#004D40"]);
+  horizontalLegend = d3.svg.legend().units("Freq").cellWidth(50).cellHeight(15).inputScale(sampleThreshold).cellStepping(100);
 
   d3.select("svg").append("g").attr("transform", "translate(50,70)").attr("class", "legend").call(horizontalLegend);
 
