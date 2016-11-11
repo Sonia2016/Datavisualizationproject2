@@ -49,10 +49,10 @@ With click on the reset button you reset your search box and also the arc diagra
 For each of the dataset that we have we map top 50 locations to the world map. This mapping is dynamically for both data set.
 Different size of circle and also different color shows how many times terms apears in that location and also that location appears itself.
 ### Wikinews
-<img width="1280" alt="screen shot 2016-11-10 at 3 39 41 pm" src="https://cloud.githubusercontent.com/assets/19417775/20195377/edd67f94-a75b-11e6-9f6f-0be07026159d.png">
+<img width="1280" alt="screen shot 2016-11-10 at 10 10 34 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204118/8e0b652a-a792-11e6-9336-b8d75931aa17.png">
 
 ### Huffington
-<img width="1280" alt="screen shot 2016-11-10 at 3 42 27 pm" src="https://cloud.githubusercontent.com/assets/19417775/20195473/560f74d0-a75c-11e6-876b-85905c3dede4.png">
+<img width="1280" alt="screen shot 2016-11-10 at 10 10 27 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204119/8e21ad30-a792-11e6-8fed-692985f8e80c.png">
 
 ## Group schedule
 ### First meeting - October 19
