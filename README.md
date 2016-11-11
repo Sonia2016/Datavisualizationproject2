@@ -19,7 +19,7 @@ We use javascript for the parsing our data. For each part of our project we have
 3. Location mapping
   1. check the longitute and lantitude of top 50 locations and restore in specific objects
 
-## Wordle
+## Wordle - Arun
 We have implemented wordle to display Top frequency words from the dataset. We have implemented wordle for four different  categories to display its top frequency and one wordle to display combination of top frequency words from these four categories.
 
 Wordle to display top frequency words from  all four category.
@@ -45,9 +45,13 @@ Select the slider to know zoom into time interval
 ![w7](https://cloud.githubusercontent.com/assets/19417775/20223288/99587eec-a7fe-11e6-8a8c-f5cf2d5f0cfe.png)
 
 
-## Timeseries
+## Timeseries - Brinidivani
+We have some initial work for the timeseries that let us insert the term and shows the corresponding frequency during the date from 2004 - 2015.
+<img width="1280" alt="screen shot 2016-11-11 at 11 08 55 am" src="https://cloud.githubusercontent.com/assets/19417775/20223454/609b1eba-a7ff-11e6-9f9c-9e1cb4d41a5e.png">
+<img width="1280" alt="screen shot 2016-11-11 at 11 09 09 am" src="https://cloud.githubusercontent.com/assets/19417775/20223455/60ad64f8-a7ff-11e6-8b76-ee834ab98216.png">
+<img width="1280" alt="screen shot 2016-11-11 at 11 09 22 am" src="https://cloud.githubusercontent.com/assets/19417775/20223456/60b0902e-a7ff-11e6-8471-ed2974a8abf5.png">
 
-## Relationship
+## Relationship - Sonia
 For two data set that we have (wikinews and huffington), we implemented two different chart for each of them that can be see as a following
 Wikinews:
 ### Overal picture
@@ -70,7 +74,7 @@ With click on search button it show the term and its relationship
 <img width="1280" alt="searchr" src="https://cloud.githubusercontent.com/assets/19417775/20195105/c63de798-a75a-11e6-86a9-8693f8da7570.png">
 With click on the reset button you reset your search box and also the arc diagram.
 
-## Map
+## Map - Sonia
 For each of the dataset that we have we map top 50 locations to the world map. This mapping is dynamically for both data set.
 Different size of circle and also different color shows how many times terms apears in that location and also that location appears itself.
 ### Wikinews
