@@ -46,9 +46,22 @@ Select the slider to know zoom into time interval
 
 
 ## Timeseries - Brinidivani
-We have some initial work for the timeseries that let us insert the term and shows the corresponding frequency during the date from 2004 - 2015.
-<img width="1280" alt="screen shot 2016-11-11 at 11 09 09 am" src="https://cloud.githubusercontent.com/assets/19417775/20223455/60ad64f8-a7ff-11e6-8b76-ee834ab98216.png">
-<img width="1280" alt="screen shot 2016-11-11 at 11 09 22 am" src="https://cloud.githubusercontent.com/assets/19417775/20223456/60b0902e-a7ff-11e6-8471-ed2974a8abf5.png">
+Implementation of Monthly frequency of a word
+The monthly frequency of each word of different categories is displayed using the line graph. We have different colors for four of the categories and line graph also has the same colors for each of the categories. The user can select any number of words from the wordle and the monthly frequency gets highlighted in the line graph.
+
+<img width="1280" alt="screen shot 2016-11-11 at 11 09 09 am" src="https://cloud.githubusercontent.com/assets/22157711/20227640/c53fad3c-a812-11e6-9d6c-48ef90e09cf0.png">
+
+Tool tip to show the word when we mouse over the graph
+When the user hover over the line graph, the word is shown using the tooltip. The opacity of the other lines in the graph reduces when a particular line is highlighted.
+
+<img width="1280" alt="screen shot 2016-11-11 at 11 09 22 am" src="https://cloud.githubusercontent.com/assets/22157711/20227684/fce7de76-a812-11e6-949a-c2492ffe7ce7.png">
+
+<img width="1280" alt="screen shot 2016-11-11 at 11 09 22 am" src="https://cloud.githubusercontent.com/assets/22157711/20227706/1af1af32-a813-11e6-859d-9fe88cfc513d.png">
+
+Selecting the range to zoom into the time interval and showing the respective graph during that interval
+The user can zoom into the time interval and the line graph changes according to that and shows the frequency of the word only in the selected time interval.
+
+<img width="1280" alt="screen shot 2016-11-11 at 11 09 22 am" src="https://cloud.githubusercontent.com/assets/22157711/20227737/499ccb32-a813-11e6-8b53-938e4804b94d.png">
 
 ## Relationship - Sonia
 For two data set that we have (wikinews and huffington), we implemented two different chart for each of them that can be see as a following
