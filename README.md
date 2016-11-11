@@ -45,7 +45,7 @@ Select the slider to know zoom into time interval
 ![w7](https://cloud.githubusercontent.com/assets/19417775/20223288/99587eec-a7fe-11e6-8a8c-f5cf2d5f0cfe.png)
 
 
-## Timeseries - Brinidivani
+## Timeseries - Brindavani
 Implementation of Monthly frequency of a word
 The monthly frequency of each word of different categories is displayed using the line graph. We have different colors for four of the categories and line graph also has the same colors for each of the categories. The user can select any number of words from the wordle and the monthly frequency gets highlighted in the line graph.
 
