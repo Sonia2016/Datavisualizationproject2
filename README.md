@@ -146,14 +146,16 @@ We talk about our visualization on relationships and also how should present the
 
 ### Eight meeting - November 8
 #### Discussion
-- [ ] We were working on the wordle cloud and timeseries
+- [X] We were working on the wordle cloud and timeseries
+- Unfortunately, we didn't have enought time to finish this part.
 - [X] We finish the same template for all parts of the project
 
 ### Ninth meeting - November 9
 #### Discussion
-- [ ] Changing the wordle
-- [ ] Changing the legend of the map
+- [X] Changing the wordle
+- [X] Changing the legend of the map
 - [ ] Try to implement the slider for the relationship
+- Unfortunatley we didn't have enought time to change it.
 
 ## Initial Visualization
 ### Map - wikinews
