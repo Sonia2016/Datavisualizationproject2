@@ -27,8 +27,12 @@ For two data set that we have (wikinews and huffington), we implemented two diff
 Wikinews:
 ### Overal picture
 It show dynamically the relationship between two different items.
+#### Wikinews
 <img width="1280" alt="wb" src="https://cloud.githubusercontent.com/assets/19417775/20195104/c63c2c82-a75a-11e6-8edb-d75835baacc4.png">
+#### Huffington
 note: huffington is not dynamic.
+<img width="1280" alt="screen shot 2016-11-10 at 10 06 37 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204071/fcae036c-a791-11e6-9219-19420b8a724c.png">
+
 ### Mouseover-Mouseout
 Whenever you mouse over on each term it shows the relationship between that to others
 <img width="1280" alt="mouseover" src="https://cloud.githubusercontent.com/assets/19417775/20195106/c63ed342-a75a-11e6-9072-fb713d19a4d8.png">
@@ -40,9 +44,6 @@ You can search whatever you want and it shows the suggestion for your search
 With click on search button it show the term and its relationship
 <img width="1280" alt="searchr" src="https://cloud.githubusercontent.com/assets/19417775/20195105/c63de798-a75a-11e6-86a9-8693f8da7570.png">
 With click on the reset button you reset your search box and also the arc diagram.
-
-
-
 
 ## Map
 For each of the dataset that we have we map top 50 locations to the world map. This mapping is dynamically for both data set.
