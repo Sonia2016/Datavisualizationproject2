@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+</head>
+
+</html>
+ <script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+	
+d3.tsv("wikinews.tsv", function(error, data) {
+
+ data.forEach(function(d) {
+      d.time = d3.time.format("%Y-%m-%d").parse(d.time.slice(0,10));
+    });
+
+  blogs =  d3.keys(data[0]).slice(0).map(function(id) {
+    return {
+      id: id,
+      values: data.map(function(d) {
+        return {time: d.time, person: d.person, location:d.location, organization:d.organization, miscellaneous:d.miscellaneous};
+      })
+    };
+  });
+
+blogs = blogs[0];
+
+var worker = new Worker("worker.js");
+
+worker.postMessage({
+  blogs : blogs
+});
+
+
+worker.onmessage = function(event) {
+  debugger;
+  links = event.data.links;
+  console.log(event.data.Person);
+  debugger;
+  
+};
+
+//    blogs.forEach(function(a){
+//       a.values.sort(function(c,d){
+//         if(c.time>d.time) return 1;
+//         else if(c.time<d.time) return -1;
+//         else return 0;
+//       });
+    
+//   });
+
+  
+//   b = 0;
+//   for(var i = 0 ; i < blogs[b].values.length; i++){
+//     blogs[b].values[i].person = blogs[b].values[i].person.split('|');
+//     blogs[b].values[i].location = blogs[b].values[i].location.split('|');
+//     blogs[b].values[i].miscellaneous = blogs[b].values[i].miscellaneous.split('|');
+//     blogs[b].values[i].organization = blogs[b].values[i].organization.split('|');
+//     topOrganization.push(blogs[b].values[i].organization);
+//     topLocation.push(blogs[b].values[i].location);
+//     topMiscellaneous.push(blogs[b].values[i].miscellaneous);
+//     topPerson.push(blogs[b].values[i].person);
+//   }
+ 
+
+//   //Frequency of each element
+//   topOrganization = frequency(topOrganization);
+//   topPerson = frequency(topPerson);
+//   topLocation = frequency(topLocation);
+//   topMiscellaneous = frequency(topMiscellaneous);
+
+  
+//    //top 50 frequency of each categories
+//   top50Location = highFrequency(topLocation,50);
+//   top50Person = highFrequency(topPerson,50);
+//   top50Miscellaneous = highFrequency(topMiscellaneous,50);
+//   top50Organization =  highFrequency(topOrganization,50);
+ 
+
+
+//   lt = {};
+
+// for(var i = 0 ; i < blogs[0].values.length;i++){
+//   var temp = []
+//   for(var l in top50Location){
+//     if(blogs[0].values[i].location.includes(l))
+//     {
+//       if(lt[blogs[0].values[i].time]== undefined)
+//         {temp.push(l);
+//           lt[blogs[0].values[i].time] = temp;
+//           lt[blogs[0].values[i].time][l] = 1;
+//         }
+//       else
+//         { if(lt[blogs[0].values[i].time].includes(l))
+//              lt[blogs[0].values[i].time][l] =  lt[blogs[0].values[i].time][l] + 1;
+//              else
+//               {
+//                 lt[blogs[0].values[i].time].push(l);
+//                 lt[blogs[0].values[i].time][l] = 1;
+//               }
+//             }
+//           }
+//         }
+//     }
+  
+
+
+
+
+
+//   var Persons = {
+//     nodes: [],
+//     links: []
+//   };
+
+ 
+
+
+
+//   // time = [];
+// tf = {};
+// for(var l in top50Location){
+//   var temp = []
+//   for(var i = 0 ; i < blogs[0].values.length;i++){
+//     if(blogs[0].values[i].location.includes(l))
+//     {temp.push(blogs[0].values[i].time);
+//     tf[l] = temp;}
+//     }
+//     // time = [];
+//   }
+
+//   // //blog id of each 50 top frequency
+//   var personBlogs = new Object();
+//   var organizationBlogs = new Object();
+//   var locationBlogs = new Object();
+//   var miscellaneousBlogs = new Object();
+   
+//   for(var w in top50Person){
+//     var temp = [];
+//     for(var i = 0 ; i < blogs[b].values.length; i++){
+//       if(blogs[b].values[i].person.includes(w)){
+//         temp.push(i);
+//         personBlogs[w]=temp;
+//       }
+//     }
+//   }
+
+//   for(var w in top50Location){
+//     var temp = [];
+//     for(var i = 0 ; i < blogs[b].values.length; i++){
+//       if(blogs[b].values[i].location.includes(w)){
+//         temp.push(i);
+//         locationBlogs[w]=temp;
+//       }
+//     }
+//   }
+  
+//    for(var w in top50Organization){
+//     var temp = [];
+//     for(var i = 0 ; i < blogs[b].values.length; i++){
+//       if(blogs[b].values[i].organization.includes(w)){
+//         temp.push(i);
+//         organizationBlogs[w]=temp;
+//       }
+//     }
+//   }
+
+//   for(var w in top50Miscellaneous){
+//     var temp = [];
+//     for(var i = 0 ; i < blogs[b].values.length; i++){
+//       if(blogs[b].values[i].miscellaneous.includes(w)){
+//         temp.push(i);
+//         miscellaneousBlogs[w]=temp;
+//       }
+//     }
+//   }
+
+// //relationship between person to pers
+//   var personPerson = new Object();
+//   for(var p in personBlogs){
+//     var temp = {};
+//     for(var l in personBlogs){
+//       for(var i = 0 ; i < personBlogs[p].length; i++){
+//         for(var j = 0 ; j < personBlogs[l].length; j++){
+//           if(p!=l)
+//           if(personBlogs[p][i] == personBlogs[l][j]){
+//              if(temp[l]==undefined){
+//               temp[l] = 1
+//             }
+//             else{
+//               temp[l]++;
+//             }
+//           } 
+//         }
+//       }
+//       personPerson[p] = temp;
+//     }
+//   }
+
+//   //relationship between person to location
+//   var personLocation = new Object();
+//   for(var p in personBlogs){
+//     var temp = {};
+//     for(var l in locationBlogs){
+//       for(var i = 0 ; i < personBlogs[p].length; i++){
+//         for(var j = 0 ; j < locationBlogs[l].length; j++){
+//           if(personBlogs[p][i] == locationBlogs[l][j]){
+//              if(temp[l]==undefined){
+//               temp[l] = 1
+//             }
+//             else{
+//               temp[l]++;
+//             }
+//           } 
+//         }
+//       }
+//       personLocation[p] = temp;
+//     }
+//   }
+
+
+//   //relationship between person to organization
+//   var personOrganziation = new Object();
+//   for(var p in personBlogs){
+//     var temp = {};
+//     for(var o in organizationBlogs){
+//       for(var i = 0 ; i < personBlogs[p].length; i++){
+//         for(var j = 0 ; j < organizationBlogs[o].length; j++){
+//           if(personBlogs[p][i] == organizationBlogs[o][j]){
+//             if(temp[o]==undefined){
+//               temp[o] = 1
+//             }
+//             else{
+//               temp[o]++;
+//             }
+           
+//           } 
+//         }
+//       }
+//        personOrganziation[p] = temp;
+//     }
+//   }
+
+//   //relationship between person to miscellaneous
+//   var personMiscellaneous = new Object();
+//   for(var p in personBlogs){
+//     var temp = {};
+//     for(var m in miscellaneousBlogs){
+//       for(var i = 0 ; i < personBlogs[p].length; i++){
+//         for(var j = 0 ; j < miscellaneousBlogs[m].length; j++){
+//           if(personBlogs[p][i] == miscellaneousBlogs[m][j]){
+//             if(temp[m]==undefined){
+//               temp[m] = 1
+//             }
+//             else{
+//               temp[m]++;
+//             }
+//           } 
+//         }
+//       }
+//        personMiscellaneous[p] = temp;
+//     }
+//   }
+
+
+// //relationship between Location to location
+//   var locationLocation = new Object();
+//   for(var l in locationBlogs){
+//     var temp = {};
+//     for(var o in locationBlogs){
+//       for(var i = 0 ; i < locationBlogs[l].length; i++){
+//         for(var j = 0 ; j < locationBlogs[o].length; j++){
+//           if(o!=l)
+//           if(locationBlogs[l][i] == locationBlogs[o][j]){
+//              if(temp[o]==undefined){
+//               temp[o] = 1
+//             }
+//             else{
+//               temp[o]++;
+//             }
+//           } 
+//         }
+//       }
+//       locationLocation[l] = temp;
+//     }
+//   }
+
+//   //relationship between Location to organization
+//   var locationOrganization = new Object();
+//   for(var l in locationBlogs){
+//     var temp = {};
+//     for(var o in organizationBlogs){
+//       for(var i = 0 ; i < locationBlogs[l].length; i++){
+//         for(var j = 0 ; j < organizationBlogs[o].length; j++){
+//           if(locationBlogs[l][i] == organizationBlogs[o][j]){
+//              if(temp[o]==undefined){
+//               temp[o] = 1
+//             }
+//             else{
+//               temp[o]++;
+//             }
+//           } 
+//         }
+//       }
+//       locationOrganization[l] = temp;
+//     }
+//   }
+
+//     //relationship between location to miscellaneous
+//   var locationMiscellaneous = new Object();
+//   for(var l in locationBlogs){
+//     var temp = {};
+//     for(var m in miscellaneousBlogs){
+//       for(var i = 0 ; i < locationBlogs[l].length; i++){
+//         for(var j = 0 ; j < miscellaneousBlogs[m].length; j++){
+//           if(locationBlogs[l][i] == miscellaneousBlogs[m][j]){
+//              if(temp[m]==undefined){
+//               temp[m] = 1
+//             }
+//             else{
+//               temp[m]++;
+//             }
+//           } 
+//         }
+//       }
+//       locationMiscellaneous[l] = temp;
+//     }
+//   }
+
+
+//    //relationship between location to miscellaneous
+//   var miscellaneousMiscellaneous = new Object();
+//   for(var l in miscellaneousBlogs){
+//     var temp = {};
+//     for(var m in miscellaneousBlogs){
+//       for(var i = 0 ; i < miscellaneousBlogs[l].length; i++){
+//         for(var j = 0 ; j < miscellaneousBlogs[m].length; j++){
+//           if(m!=l)
+//           if(miscellaneousBlogs[l][i] == miscellaneousBlogs[m][j]){
+//              if(temp[m]==undefined){
+//               temp[m] = 1
+//             }
+//             else{
+//               temp[m]++;
+//             }
+//           } 
+//         }
+//       }
+//       miscellaneousMiscellaneous[l] = temp;
+//     }
+//   }
+
+//     //relationship between organization to miscellaneous
+//   var organizationMiscellaneous = new Object();
+//   for(var o in organizationBlogs){
+//     var temp = {};
+//     for(var m in miscellaneousBlogs){
+//       for(var i = 0 ; i < organizationBlogs[o].length; i++){
+//         for(var j = 0 ; j < miscellaneousBlogs[m].length; j++){
+//           if(organizationBlogs[o][i] == miscellaneousBlogs[m][j]){
+//             if(temp[m]==undefined){
+//               temp[m] = 1
+//             }
+//             else{
+//               temp[m]++;
+//             }
+//           } 
+//         }
+//       }
+//       organizationMiscellaneous[o] = temp;
+//     }
+//   }
+
+//      //relationship between organization to organization
+//   var organizationOrganization = new Object();
+//   for(var o in organizationBlogs){
+//     var temp = {};
+//     for(var m in organizationBlogs){
+//       for(var i = 0 ; i < organizationBlogs[o].length; i++){
+//         for(var j = 0 ; j < organizationBlogs[m].length; j++){
+//           if(o!=m)
+//           if(organizationBlogs[o][i] == organizationBlogs[m][j]){
+//             if(temp[m]==undefined){
+//               temp[m] = 1
+//             }
+//             else{
+//               temp[m]++;
+//             }
+//           } 
+//         }
+//       }
+//       organizationOrganization[o] = temp;
+//     }
+//   }
+
+//     var i = 0;
+//     for(p in top50Person){
+//       if(top50Person[p]>50){
+//       Persons.nodes.push({
+//         "name": p,
+//         "count": top50Person[p],
+//         "id": i,
+//         "group": 1
+//       });
+//       i++;
+//     }
+//     }
+    
+//     for(l in top50Location){
+//       if(top50Location[l]> 50){
+//       Persons.nodes.push({
+//         "name": l,
+//         "count": top50Location[l],
+//         "id": i,
+//         "group": 2
+//       });
+//       i++;
+//     }
+//     }
+    
+//      for(o in top50Organization){
+//       if(top50Organization[o]> 50){
+//       Persons.nodes.push({
+//         "name": o,
+//         "count": top50Organization[o],
+//         "id": i,
+//         "group": 3
+//       });
+//       i++;
+//     }
+//     }
+    
+//      for(m in top50Miscellaneous){
+//       if(top50Miscellaneous[m]> 50){
+//       Persons.nodes.push({
+//         "name": m,
+//         "count": top50Miscellaneous[m],
+//         "id": i,
+//         "group": 4
+//       });
+//       i++;
+//     }
+//     }
+
+// for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in personLocation){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in personLocation[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":personLocation[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+ 
+// for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in personPerson){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in personPerson[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":personPerson[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+ 
+// for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in locationLocation){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in locationLocation[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":locationLocation[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+  
+
+//  for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in organizationOrganization){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in organizationOrganization[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":organizationOrganization[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+//  for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in miscellaneousMiscellaneous){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in miscellaneousMiscellaneous[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":miscellaneousMiscellaneous[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+ 
+
+//   for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in personOrganziation){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in personOrganziation[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":personOrganziation[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+  
+
+//  for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in personMiscellaneous){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in personMiscellaneous[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":personMiscellaneous[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+
+
+
+//  for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in locationOrganization){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in locationOrganization[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":locationOrganization[p][i]
+
+
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+
+
+
+// for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in locationMiscellaneous){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in locationMiscellaneous[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value":locationMiscellaneous[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+
+
+// for(var k = 0 ; k < Persons.nodes.length; k++){
+//   for(var p in organizationMiscellaneous){
+//     if(Persons.nodes[k].name==p){
+//        for(var i in organizationMiscellaneous[p]){
+//         for(var k1 = 0 ; k1 < Persons.nodes.length; k1++){
+//                 if(i==Persons.nodes[k1].name){
+//                     Persons.links.push({
+//                     "source": Persons.nodes[k].id,
+//                     "target": Persons.nodes[k1].id,
+//                     "value": organizationMiscellaneous[p][i]
+//                   })
+//         }
+//       }
+//     }
+//   }
+// }
+// }
+
+
+
+
+// console.log(JSON.stringify(Persons));
+//   var url = 'top50Location:text/json;charset=utf8,' + JSON.stringify(Persons.links);
+//   window.open(url, '_blank');
+//   window.focus();
+
+//   console.log(top50Location);
+  // console.log(top50Person);
+  // console.log(top50Miscellaneous);
+  // console.log(top50Organization);
+
+  // console.log(personLocation);
+  // console.log(organizationMiscellaneous);
+  // console.log(locationMiscellaneous);
+  // console.log(locationOrganization);
+  // console.log(personMiscellaneous);
+  // console.log(personOrganziation);
+
+});
+
+
+
+</script>
