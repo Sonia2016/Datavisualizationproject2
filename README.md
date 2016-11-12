@@ -96,16 +96,17 @@ Different size of circle and also different color shows how many times terms ape
 ### Wikinews
 <img width="1280" alt="screen shot 2016-11-10 at 10 10 34 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204118/8e0b652a-a792-11e6-9336-b8d75931aa17.png">
 If you mouseover on the circle it shows the number of frequency and the name of the country
-<img width="1280" alt="screen shot 2016-11-11 at 10 04 21 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235558/f08748ae-a85a-11e6-8de8-efa704eaca8e.png">
+<img width="1280" alt="screen shot 2016-11-11 at 10 04 42 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235559/f09c0fe6-a85a-11e6-8cea-ff0f7ce4d69c.png">
 If you mouseover on the special country it also shows the name of the country
-<img width="1280" alt="screen shot 2016-11-11 at 10 04 29 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235560/f09c8ef8-a85a-11e6-8f96-48a90a69e132.png">
+<img width="1280" alt="screen shot 2016-11-11 at 10 04 44 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235561/f09f066a-a85a-11e6-9486-0f3c9ca18708.png">
+
 
 ### Huffington
 <img width="1280" alt="screen shot 2016-11-10 at 10 10 27 pm" src="https://cloud.githubusercontent.com/assets/19417775/20204119/8e21ad30-a792-11e6-8fed-692985f8e80c.png">
 If you mouseover on the circle it shows the number of frequency and the name of the country
-<img width="1280" alt="screen shot 2016-11-11 at 10 04 42 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235559/f09c0fe6-a85a-11e6-8cea-ff0f7ce4d69c.png">
+<img width="1280" alt="screen shot 2016-11-11 at 10 04 21 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235558/f08748ae-a85a-11e6-8de8-efa704eaca8e.png">
 If you mouseover on the special country it also shows the name of the country
-<img width="1280" alt="screen shot 2016-11-11 at 10 04 44 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235561/f09f066a-a85a-11e6-9486-0f3c9ca18708.png">
+<img width="1280" alt="screen shot 2016-11-11 at 10 04 29 pm" src="https://cloud.githubusercontent.com/assets/19417775/20235560/f09c8ef8-a85a-11e6-8f96-48a90a69e132.png">
 
 ## Our Story
 
